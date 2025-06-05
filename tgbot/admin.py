@@ -242,7 +242,7 @@ class SSHKeyAdmin(admin.ModelAdmin):
 @admin.register(Configuration)
 class ConfigurationAdmin(SingletonModelAdmin):
     fieldsets = (
-        (None, {'fields': ('test_mode')}),
+        (None, {'fields': ('test_mode',)}),
     )
 
 
