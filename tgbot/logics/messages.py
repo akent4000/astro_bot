@@ -140,7 +140,7 @@ class SendMessages:
 
             sent = SendMessages.update_or_replace_last_message(
                 user, 
-                False,
+                True,
                 text=text, 
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
                 parse_mode="Markdown"
