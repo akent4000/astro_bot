@@ -91,7 +91,7 @@ class SendMessages:
         def menu(user: TelegramUser, forced_delete: bool=False):
             SendMessages.update_or_replace_last_message(
                 user,
-                False,
+                forced_delete,
                 text=Messages.MENU_MESSAGE,
                 reply_markup=Keyboards.MainMenu.menu(), 
                 parse_mode="Markdown"
