@@ -97,7 +97,7 @@ class SendMessages:
         @staticmethod
         def today(user: TelegramUser):
             moscow_tz = ZoneInfo('Europe/Moscow')
-            today_moscow = datetime.now(moscow_tz).date()
+            today_moscow = datetime.datetime.now(moscow_tz).date()
             formatted_date = today_moscow.strftime("%d.%m.%Y")
             text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=moon_phase(today_moscow))
 
