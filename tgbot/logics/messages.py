@@ -58,7 +58,7 @@ class SendMessages:
         if not last_sent:
             new_msg = bot.send_message(chat_id=user.chat_id, text=text, **kwargs)
             SentMessage.objects.create(telegram_user=user, message_id=new_msg.message_id)
-            return
+            return new_msg
 
         chat_id = user.chat_id
         message_id = last_sent.message_id
