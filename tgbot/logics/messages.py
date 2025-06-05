@@ -115,7 +115,7 @@ class SendMessages:
             formatted_date = today_moscow.strftime("%d.%m.%Y")
             text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=moon_phase(today_moscow))
 
-            SendMessages.update_or_replace_last_message(
+            return SendMessages.update_or_replace_last_message(
                 user, 
                 False,
                 text=text, 
@@ -132,13 +132,23 @@ class SendMessages:
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
                 parse_mode="Markdown"
             )
+        
+        @staticmethod
+        def incorrect_enter_date(user: TelegramUser):
+            return SendMessages.update_or_replace_last_message(
+                user, 
+                True,
+                text=Messages.MOON_CALC_ENTER_DATE_INCORRECT, 
+                reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
+                parse_mode="Markdown"
+            )
 
         @staticmethod
         def date(user: TelegramUser, date:datetime.datetime):
             formatted_date = date.date().strftime("%d.%m.%Y")
             text = Messages.MOON_CALC_MSG.format(date=formatted_date, moon_phase=moon_phase(date))
 
-            sent = SendMessages.update_or_replace_last_message(
+            return SendMessages.update_or_replace_last_message(
                 user, 
                 True,
                 text=text, 
@@ -146,7 +156,8 @@ class SendMessages:
                 parse_mode="Markdown"
             )
 
-            return sent
+        
+
 
 
 

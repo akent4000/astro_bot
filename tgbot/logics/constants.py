@@ -84,7 +84,8 @@ class Messages:
     MOON_CALC = "Калькулятор фаз Луны"
     MOON_CALC_MSG = "{date}\n{moon_phase}"
     MOON_CALC_TODAY = f"Сегодня {MOON_CALC_MSG}"
-    MOON_CALC_ENTER_DATE = "Введите дату в формате дд.мм.гггг"
+    MOON_CALC_ENTER_DATE = "Введите дату в формате дд.мм.гггг, например: 05.06.2025"
+    MOON_CALC_ENTER_DATE_INCORRECT = "Неверный формат даты. Введите дату в формате дд.мм.гггг, например: 05.06.2025"
 
     USER_BLOCKED = "❌ Вы заблокированы и не можете пользоваться ботом."
     USER_NOT_FOUND_ERROR = "Ошибка: пользователь не найден."

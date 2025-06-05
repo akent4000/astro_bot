@@ -45,8 +45,7 @@ def process_moon_date(message, user: TelegramUser):
         dt = datetime.datetime.strptime(text, "%d.%m.%Y")
     except ValueError:
         # Неправильный формат, просим ещё раз
-        error_msg = "Неверный формат даты. Введите дату в формате дд.мм.гггг, например: 05.06.2025"
-        sent = bot.send_message(user.chat_id, error_msg)
+        sent = SendMessages.MoonCalc.incorrect_enter_date(user)
         bot.register_next_step_handler(sent, process_moon_date, user)
         return
 
