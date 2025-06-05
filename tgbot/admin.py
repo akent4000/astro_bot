@@ -24,9 +24,9 @@ from tgbot.managers.ssh_manager import SSHAccessManager, sync_keys
 from tgbot.models import *
 from tgbot.forms import SSHKeyAdminForm, SSHKeyChangeForm, SendMessageForm
 
-admin.site.site_header = "Администрирование Open Locks"
-admin.site.site_title = "Администрирование Open Locks"
-admin.site.index_title = "Администрирование Open Locks"
+admin.site.site_header = "Администрирование Astro Bot"
+admin.site.site_title = "Администрирование Astro Bot"
+admin.site.index_title = "Администрирование Astro Bot"
 
 ##############################
 # TelegramBotToken Admin
@@ -242,7 +242,7 @@ class SSHKeyAdmin(admin.ModelAdmin):
 @admin.register(Configuration)
 class ConfigurationAdmin(SingletonModelAdmin):
     fieldsets = (
-        (None, {'fields': ('test_mode', 'auto_request_permission')}),
+        (None, {'fields': ('test_mode')}),
     )
 
 
