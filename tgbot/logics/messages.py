@@ -55,12 +55,13 @@ class SendMessages:
 
         try:
             # Пытаемся отредактировать текст последнего сообщения
-            bot.edit_message_text(
+            sent = bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
                 text=text,
                 **kwargs
             )
+            return sent
         except ApiException:
             # Если не получилось редактировать (например, сообщение удалено или слишком старое),
             # удаляем старое и отправляем новое.
@@ -72,6 +73,7 @@ class SendMessages:
 
             new_msg = bot.send_message(chat_id=chat_id, text=text, **kwargs)
             SentMessage.objects.create(telegram_user=user, message_id=new_msg.message_id)
+            return new_msg
 
 
     class MainMenu:
@@ -122,11 +124,34 @@ class SendMessages:
             formatted_date = date.date().strftime("%d.%m.%Y")
             text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=moon_phase(date))
 
-            SendMessages.update_or_replace_last_message(
+            sent = SendMessages.update_or_replace_last_message(
                 user, 
                 text=text, 
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
                 parse_mode="Markdown"
             )
+
+            bot.register_next_step_handler(sent, SendMessages.MoonCalc.process_moon_date, user)
+
+        @staticmethod
+        def process_moon_date(message: Message, user: TelegramUser):
+            """
+            Обрабатывает ответ пользователя на запрос даты.
+            Парсит дату и вызывает SendMessages.MoonCalc.date.
+            Если формат некорректный, просит ввести снова.
+            """
+            text = message.text.strip()
+            try:
+                # Парсим строку в datetime; при неверном формате выбросит ValueError
+                dt = datetime.datetime.strptime(text, "%d.%m.%Y")
+            except ValueError:
+                # Неправильный формат, просим ещё раз
+                error_msg = "Неверный формат даты. Введите дату в формате дд.мм.гггг, например: 05.06.2025"
+                sent = bot.send_message(user.chat_id, error_msg)
+                bot.register_next_step_handler(sent, SendMessages.MoonCalc.process_moon_date, user)
+                return
+
+            # Дата получена и распарсена, вызываем нужный метод
+            SendMessages.MoonCalc.date(user, dt)
 
     
