@@ -136,7 +136,7 @@ class SendMessages:
         @staticmethod
         def date(user: TelegramUser, date:datetime.datetime):
             formatted_date = date.date().strftime("%d.%m.%Y")
-            text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=moon_phase(date))
+            text = Messages.MOON_CALC_MSG.format(date=formatted_date, moon_phase=moon_phase(date))
 
             sent = SendMessages.update_or_replace_last_message(
                 user, 
