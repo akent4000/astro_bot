@@ -4,6 +4,7 @@ from tgbot.dispatcher import bot
 from tgbot.logics.constants import CallbackData, Messages
 from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
 from tgbot.logics.messages import SendMessages
+from tgbot.models import TelegramUser
 
 # Обработчик для MOON_CALC (главное меню MoonCalc)
 @bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.MOON_CALC)
