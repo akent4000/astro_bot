@@ -1,7 +1,7 @@
 from django.urls import path
 
 from django.views.generic import RedirectView
-from OpenLocks import settings
+from AstroBot import settings
 
 app_name = 'tgbot'
 
