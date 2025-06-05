@@ -23,7 +23,7 @@ _test_thread = None
 
 def _run_main_bot():
     """Цикл polling для основного бота"""
-    from tgbot.handlers import commands, message_handler, utils  # noqa: F401
+    from tgbot.handlers import commands, main_menu, moon_calc, utils
 
     while True:
         try:
