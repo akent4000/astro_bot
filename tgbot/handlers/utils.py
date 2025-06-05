@@ -5,7 +5,6 @@ from tgbot.models import ArticlesSection, ArticlesSubsection, QuizTopic, QuizLev
 from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
 
 
-
 # Обработчик для INT_FACTS (главное меню IntFacts)
 @bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.INT_FACTS)
 def handle_int_facts(call: CallbackQuery):

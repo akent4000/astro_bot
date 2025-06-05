@@ -10,7 +10,6 @@ def handle_moon_calc(call: CallbackQuery):
     if not user:
         return
     
-    
 
 # Обработчик для MOON_CALC_TODAY
 @bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.MOON_CALC_TODAY)
