@@ -21,62 +21,100 @@ logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
 @receiver(pre_save, sender=Server)
 def server_pre_save(sender, instance, **kwargs):
+    """
+    На pre_save кладём в instance._old_instance прежний вариант (если он есть).
+    Если instance.pk is None (новый объект), просто запоминаем old_instance = None.
+    """
     if instance.pk is None:
+        # первый сохранённый экземпляр – старой версии нет
         instance._old_instance = None
     else:
         try:
             instance._old_instance = sender.objects.get(pk=instance.pk)
         except sender.DoesNotExist:
-
             instance._old_instance = None
+
 
 @receiver(post_save, sender=Server)
 def server_post_save(sender, instance, created, **kwargs):
-    # Determine changed fields
+    """
+    После сохранения (post_save) смотрим, какие поля изменились.
+    Если changed_fields содержит 'user' — синхронизируем ключи с задержкой при создании,
+    либо убираем/пересоздаём их сразу при обновлении.
+    Также, если создан новый объект или изменились SSH-параметры, вызываем set_auth_methods.
+    """
+    # Определим список изменённых полей
     changed_fields = []
-    if hasattr(instance, "_old_instance"):
-        old_instance = instance._old_instance
-        for field in instance._meta.fields:
-            field_name = field.name
-            old_value = getattr(old_instance, field_name)
-            new_value = getattr(instance, field_name)
-            if old_value != new_value:
-                changed_fields.append(field_name)
-    else:
-        changed_fields = [field.name for field in instance._meta.fields]
 
-    # If the 'user' field changed, synchronize SSH keys
+    if created or instance._old_instance is None:
+        # если только что создали, считаем все поля «изменёнными»
+        changed_fields = [field.name for field in instance._meta.fields]
+    else:
+        old = instance._old_instance
+        for field in instance._meta.fields:
+            name = field.name
+            old_value = getattr(old, name)
+            new_value = getattr(instance, name)
+            if old_value != new_value:
+                changed_fields.append(name)
+
+    # Если изменилось поле 'user'
     if 'user' in changed_fields:
         if created:
+            # При создании – через 30 секунд запускаем sync_keys(), потому что
+            # сетевые/SSH-операции могут требовать, чтобы система успела «подумать»
             timer = threading.Timer(30, sync_keys)
             timer.start()
         else:
-            manager = SSHAccessManager()
-            current_keys = set(manager.get_ssh_keys(instance._old_instance.user))
-            for key in current_keys:
-                manager.remove_ssh_key(instance._old_instance.user, key)
+            # При обновлении – сначала удалим старые ключи, потом синхронизируем
+            old_user = instance._old_instance.user if instance._old_instance else None
+            if old_user:
+                manager = SSHAccessManager()
+                current_keys = set(manager.get_ssh_keys(old_user))
+                for key in current_keys:
+                    manager.remove_ssh_key(old_user, key)
             sync_keys()
 
-    # For SSH authentication settings, check if any relevant field changed
-    auth_fields = ['password_auth', 'pubkey_auth', 'permit_root_login', 'permit_empty_passwords']
-    if created or any(field in changed_fields for field in auth_fields):
+    # Поля, отвечающие за SSH-аутентификацию:
+    auth_fields = [
+        'password_auth',
+        'pubkey_auth',
+        'permit_root_login',
+        'permit_empty_passwords'
+    ]
+
+    # Если создали новый или изменились настройки аутентификации – вызываем set_auth_methods
+    if created or any(f in changed_fields for f in auth_fields):
         password_auth = instance.password_auth
         pubkey_auth = instance.pubkey_auth
         permit_root_login = instance.permit_root_login
         permit_empty_passwords = instance.permit_empty_passwords
-        new_password_for_user = None  # Not stored in model; update only if provided elsewhere
-        
-        # Choose appropriate manager: SSHAccessManager for main server, RemoteServerManager otherwise
+
+        # new_password_for_user мы не храним в модели, предполагаем, что его установит кто-то отдельно
+        new_password_for_user = None
+
         manager = SSHAccessManager()
-        
-        # If the server is newly created, run the update after 30 seconds, else run it immediately.
+
         if created:
-            timer = threading.Timer(30, lambda: manager.set_auth_methods(
-                password_auth, pubkey_auth, permit_root_login, permit_empty_passwords, new_password_for_user))
+            timer = threading.Timer(
+                30,
+                lambda: manager.set_auth_methods(
+                    password_auth,
+                    pubkey_auth,
+                    permit_root_login,
+                    permit_empty_passwords,
+                    new_password_for_user
+                )
+            )
             timer.start()
         else:
             manager.set_auth_methods(
-                password_auth, pubkey_auth, permit_root_login, permit_empty_passwords, new_password_for_user)
+                password_auth,
+                pubkey_auth,
+                permit_root_login,
+                permit_empty_passwords,
+                new_password_for_user
+            )
             
 
 
