@@ -19,16 +19,7 @@ def handle_start(message: Message):
         logger.info(f"User {message.chat.id} started the bot.")
         user, created = sync_user_data(message)
         logger.info(f"User {user} created: {created}")
-        if not created:
-            try:
-                ids_qs = SentMessage.objects.filter(telegram_user=user)
-                message_ids = list(ids_qs.values_list("message_id", flat=True))
-                bot.delete_messages(user.chat_id, message_ids)
-                ids_qs.delete()
-            except Exception:
-                SentMessage.objects.filter(telegram_user=user).delete()
-
-        SendMessages.MainMenu.menu(user)
+        SendMessages.MainMenu.menu(user, True)
 
     except Exception as e:
         logger.exception(e)

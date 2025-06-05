@@ -29,7 +29,7 @@ from tgbot.models import SentMessage, TelegramUser
 
 class SendMessages:
     @staticmethod
-    def update_or_replace_last_message(user: TelegramUser, text: str, **kwargs):
+    def update_or_replace_last_message(user: TelegramUser, forced_delete: bool, text: str, **kwargs):
         """
         Пытается изменить последнее отправленное пользователю сообщение.
         Если редактирование не удалось (например, сообщение уже не редактируется),
@@ -42,6 +42,16 @@ class SendMessages:
                     например reply_markup, parse_mode и т.д.
         """
         # Получаем последнее отправленное сообщение
+
+        if forced_delete:
+            try:
+                ids_qs = SentMessage.objects.filter(telegram_user=user)
+                message_ids = list(ids_qs.values_list("message_id", flat=True))
+                bot.delete_messages(user.chat_id, message_ids)
+                ids_qs.delete()
+            except Exception:
+                SentMessage.objects.filter(telegram_user=user).delete()
+
         last_sent = SentMessage.objects.filter(telegram_user=user).order_by('-created_at').first()
         
         # Если нет предыдущих сообщений, просто отправляем новое
@@ -78,9 +88,10 @@ class SendMessages:
 
     class MainMenu:
         @staticmethod
-        def menu(user: TelegramUser):
+        def menu(user: TelegramUser, forced_delete: bool=False):
             SendMessages.update_or_replace_last_message(
-                user, 
+                user,
+                False,
                 text=Messages.MENU_MESSAGE,
                 reply_markup=Keyboards.MainMenu.menu(), 
                 parse_mode="Markdown"
@@ -90,7 +101,8 @@ class SendMessages:
         @staticmethod
         def menu(user: TelegramUser):
             SendMessages.update_or_replace_last_message(
-                user, 
+                user,
+                False,
                 text=Messages.MOON_CALC, 
                 reply_markup=Keyboards.MoonCalc.menu(), 
                 parse_mode="Markdown"
@@ -105,6 +117,7 @@ class SendMessages:
 
             SendMessages.update_or_replace_last_message(
                 user, 
+                False,
                 text=text, 
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
                 parse_mode="Markdown"
@@ -114,6 +127,7 @@ class SendMessages:
         def enter_date(user: TelegramUser):
             SendMessages.update_or_replace_last_message(
                 user, 
+                True,
                 text=Messages.MOON_CALC_ENTER_DATE, 
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
                 parse_mode="Markdown"
@@ -126,6 +140,7 @@ class SendMessages:
 
             sent = SendMessages.update_or_replace_last_message(
                 user, 
+                False,
                 text=text, 
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(), 
                 parse_mode="Markdown"
