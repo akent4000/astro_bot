@@ -1,0 +1,61 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{# Загружаем внешние CSS и JS, пусть JS выполнится после разбора DOM #}
+{% block extrahead %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
+    <script src="{% static 'js/admin_toggle.js' %}" defer></script>
+{% endblock %}
+
+{# Добавляем кнопки в тулзы #}
+{% block object-tools-items %}
+    {{ block.super }}
+    <li>
+        <a href="{{ sync_keys_url }}">Синхронизировать SSH ключи</a>
+    </li>
+    <li>
+        <button id="toggle-instructions-btn" type="button" class="button">
+            Показать инструкцию
+        </button>
+    </li>
+{% endblock %}
+
+{# Содержимое страницы со скрытым блоком инструкции #}
+{% block content %}
+    {{ block.super }}
+
+    <div id="instructions-block" class="module aligned">
+      <h2>Инструкция по изменению прав доступа к файлу с приватным ключом</h2>
+      <p>
+        Если при подключении к серверу вы видите подобную ошибку:
+      </p>
+      <pre><code>ssh root@46.226.162.132 -i /путь/до/файла.pem
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Permissions for '/путь/до/файла.pem' are too open.
+It is required that your private key files are NOT accessible by others.
+This private key will be ignored.
+Load key "/путь/до/файла.pem": bad permissions
+root@46.226.162.132: Permission denied (publickey)</code></pre>
+      <p>Вам необходимо изменить права доступа к файлу с приватным ключом:</p>
+      <ul>
+        <li><strong>Linux/macOS:</strong>
+          <ul>
+            <li>Откройте терминал и выполните:
+              <code>chmod 600 /путь/до/файла.pem</code>
+            </li>
+          </ul>
+        </li>
+        <li><strong>Windows (CMD):</strong>
+          <ul>
+            <li>Запустите командную строку от администратора и выполните:
+              <code>icacls "C:\путь\до\файла.pem" /inheritance:r /grant:r %USERNAME%:F</code>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+{% endblock %}
