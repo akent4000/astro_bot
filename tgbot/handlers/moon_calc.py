@@ -18,7 +18,7 @@ def handle_moon_calc_today(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    SendMessages.MoonCalc.today()
+    SendMessages.MoonCalc.today(user)
 
 
 # Обработчик для MOON_CALC_ENTER_DATE
@@ -27,5 +27,5 @@ def handle_moon_calc_enter_date(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    SendMessages.MoonCalc.enter_date()
+    SendMessages.MoonCalc.enter_date(user)
 
