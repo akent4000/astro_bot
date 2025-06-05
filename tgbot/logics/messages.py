@@ -125,7 +125,7 @@ class SendMessages:
 
         @staticmethod
         def enter_date(user: TelegramUser):
-            SendMessages.update_or_replace_last_message(
+            return SendMessages.update_or_replace_last_message(
                 user, 
                 True,
                 text=Messages.MOON_CALC_ENTER_DATE, 
