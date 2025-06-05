@@ -266,8 +266,6 @@ class TelegramUserAdmin(admin.ModelAdmin):
     )
     search_fields = ('chat_id', 'first_name', 'last_name', 'username')
     list_filter = (
-        'is_group',
-        'can_publish_tasks', 
         'blocked',
         'send_admin_notifications',
         'bot_was_blocked',

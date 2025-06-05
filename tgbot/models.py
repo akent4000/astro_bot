@@ -253,11 +253,11 @@ class Quiz(models.Model):
         help_text='Краткое название квиза'
     )
     topic = models.ForeignKey(
-        QuizLevel,
+        QuizTopic,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='quizzes',
+        related_name='quizzes_by_topic',
         verbose_name='Категория теста'
     )
     level = models.ForeignKey(
@@ -265,7 +265,7 @@ class Quiz(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='quizzes',
+        related_name='quizzes_by_level',
         verbose_name='Категория теста'
     )
 

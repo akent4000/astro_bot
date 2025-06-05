@@ -218,27 +218,43 @@ class Keyboards:
                 markup.add(btn)
 
             return Keyboards._add_menu(markup)
-        
+
         @staticmethod
-        def choose_level(quiz_topic: QuizTopic):
-            levels = QuizLevel.objects.filter(quizzes__topic=quiz_topic).distinct()
+        def choose_level(quiz_topic: QuizTopic) -> InlineKeyboardMarkup:
+            levels = QuizLevel.objects.filter(quizzes_by_level__topic=quiz_topic).distinct()
             markup = InlineKeyboardMarkup()
 
             for level in levels:
-                callback = Keyboards.build_callback_data(CallbackData.QUIZZES_LEVEL, {CallbackData.QUIZZES_LEVEL_ID: level.id, CallbackData.QUIZZES_TOPIC_ID: quiz_topic.id})
+                callback = Keyboards.build_callback_data(
+                    CallbackData.QUIZZES_LEVEL,
+                    {
+                        CallbackData.QUIZZES_LEVEL_ID: level.id,
+                        CallbackData.QUIZZES_TOPIC_ID: quiz_topic.id
+                    }
+                )
                 btn = InlineKeyboardButton(text=level.title, callback_data=callback)
                 markup.add(btn)
 
             return Keyboards._add_menu(Keyboards._add_back(markup, CallbackData.QUIZZES))
-        
+
         @staticmethod
-        def choose_quiz(quiz_topic: QuizTopic, quiz_level: QuizLevel):
+        def choose_quiz(quiz_topic: QuizTopic, quiz_level: QuizLevel) -> InlineKeyboardMarkup:
             quizzes = Quiz.objects.filter(topic=quiz_topic, level=quiz_level)
             markup = InlineKeyboardMarkup()
 
             for quiz in quizzes:
-                callback = Keyboards.build_callback_data(CallbackData.QUIZZES_TOPIC, {CallbackData.QUIZZES_TOPIC_ID: quiz.id})
-                btn = InlineKeyboardButton(text=quiz.title, callback_data=callback)
+                callback = Keyboards.build_callback_data(
+                    CallbackData.QUIZZES_QUIZ,
+                    { CallbackData.QUIZZES_QUIZ_ID: quiz.id }
+                )
+                btn = InlineKeyboardButton(text=quiz.title or f"Тест #{quiz.id}", callback_data=callback)
                 markup.add(btn)
 
-            return Keyboards._add_menu(Keyboards._add_back(markup, Keyboards.build_callback_data(CallbackData.QUIZZES_TOPIC, {CallbackData.QUIZZES_TOPIC_ID: quiz_topic.id})))
+            back_cb = Keyboards.build_callback_data(
+                CallbackData.QUIZZES_LEVEL,
+                {
+                    CallbackData.QUIZZES_LEVEL_ID: quiz_level.id,
+                    CallbackData.QUIZZES_TOPIC_ID: quiz_topic.id
+                }
+            )
+            return Keyboards._add_menu(Keyboards._add_back(markup, back_cb))
