@@ -21,12 +21,20 @@ def handle_start(message: Message):
         logger.info(f"User {user} created: {created}")
         if not created:
             try:
-                ids = SentMessage.objects.filter(telegram_user=user) \
-                         .values_list("message_id", flat=True)
-                bot.delete_messages(user.chat_id, list(ids))
-            except:
-                pass
-        
+                # Получаем все message_id, которые храним в базе
+                ids_qs = SentMessage.objects.filter(telegram_user=user)
+                message_ids = list(ids_qs.values_list("message_id", flat=True))
+
+                # Пробуем удалить их у Telegram
+                bot.delete_messages(user.chat_id, message_ids)
+
+                # После успешного (или даже неудачного) удаления убираем записи из базы
+                ids_qs.delete()
+            except Exception:
+                # Если что-то пошло не так, всё равно очищаем записи из базы,
+                # чтобы не накапливались "битые" ссылки на сообщения
+                SentMessage.objects.filter(telegram_user=user).delete()
+
         SendMessages.MainMenu.menu(user)
 
     except Exception as e:
