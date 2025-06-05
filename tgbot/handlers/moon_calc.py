@@ -30,7 +30,7 @@ def handle_moon_calc_enter_date(call: CallbackQuery):
     if not user:
         return
     sent = SendMessages.MoonCalc.enter_date(user)
-    bot.register_next_step_handler(sent, SendMessages.MoonCalc.process_moon_date, user)
+    bot.register_next_step_handler(sent, process_moon_date, user)
 
 
 def process_moon_date(message, user: TelegramUser):
@@ -47,7 +47,7 @@ def process_moon_date(message, user: TelegramUser):
         # Неправильный формат, просим ещё раз
         error_msg = "Неверный формат даты. Введите дату в формате дд.мм.гггг, например: 05.06.2025"
         sent = bot.send_message(user.chat_id, error_msg)
-        bot.register_next_step_handler(sent, SendMessages.MoonCalc.process_moon_date, user)
+        bot.register_next_step_handler(sent, process_moon_date, user)
         return
 
     # Дата получена и распарсена, вызываем нужный метод
