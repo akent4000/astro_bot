@@ -21,8 +21,14 @@ logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
 @receiver(pre_save, sender=Server)
 def server_pre_save(sender, instance, **kwargs):
-    if instance.pk:
-        instance._old_instance = sender.objects.get(pk=instance.pk)
+    if instance.pk is None:
+        instance._old_instance = None
+    else:
+        try:
+            instance._old_instance = sender.objects.get(pk=instance.pk)
+        except sender.DoesNotExist:
+
+            instance._old_instance = None
 
 @receiver(post_save, sender=Server)
 def server_post_save(sender, instance, created, **kwargs):
