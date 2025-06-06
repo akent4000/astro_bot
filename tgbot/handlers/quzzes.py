@@ -12,7 +12,7 @@ def handle_quizzes(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    SendMessages.MoonCalc.menu(user)
+    SendMessages.Quizzes.choose_topic(user)
 
 # Обработчик для QUIZZES_TOPIC (с параметром topic_id)
 @bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_TOPIC)
