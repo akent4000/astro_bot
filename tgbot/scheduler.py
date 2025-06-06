@@ -40,9 +40,6 @@ def run_scheduler():
             # Найти всех подписчиков, чьё send_time == current_time
             subs = DailySubscription.objects.filter(send_time=current_time)
             if subs.exists():
-                # Берём первый доступный факт на сегодня (если есть)
-                fact = InterestingFact.objects.filter(date_to_mailing=current_date).first()
-
                 for sub in subs:
                     user = sub.user
                     SendMessages.IntFacts.today(user, True)
