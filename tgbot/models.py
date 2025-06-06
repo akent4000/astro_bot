@@ -278,8 +278,8 @@ class QuizTopic(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Категория тестов'
-        verbose_name_plural = 'Категории тестов'
+        verbose_name = 'Темы тестов'
+        verbose_name_plural = 'Тема тестов'
 
     def __str__(self):
         return self.title
@@ -314,7 +314,7 @@ class Quiz(models.Model):
         null=True,
         blank=True,
         related_name='quizzes_by_topic',
-        verbose_name='Категория теста'
+        verbose_name='Тема квиза'
     )
     level = models.ForeignKey(
         QuizLevel,
@@ -322,12 +322,12 @@ class Quiz(models.Model):
         null=True,
         blank=True,
         related_name='quizzes_by_level',
-        verbose_name='Категория теста'
+        verbose_name='Категория квиза'
     )
 
     class Meta:
-        verbose_name = 'Тест'
-        verbose_name_plural = 'Тесты'
+        verbose_name = 'Квиз'
+        verbose_name_plural = 'Квизы'
 
     def __str__(self):
         return self.title or f"Тест #{self.pk}"
