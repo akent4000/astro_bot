@@ -190,7 +190,7 @@ class ArticlesSubsection(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название подраздела статей')
     section = models.ForeignKey(
         ArticlesSection,
-        related_name='section',
+        related_name='subsections',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
