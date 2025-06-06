@@ -392,8 +392,8 @@ class SendMessages:
             )
 
         @staticmethod
-        def sub(user: TelegramUser, time: datetime.datetime):
-            formatted_time = time.time().strftime("%H:%M")
+        def sub(user: TelegramUser, time: datetime.time):
+            formatted_time = time.strftime("%H:%M")
             text = Messages.INT_FACTS_SUB.format(time=formatted_time)
             logger.debug(f"IntFacts.sub: user={user}, time={formatted_time}")
 

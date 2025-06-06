@@ -65,7 +65,8 @@ def handle_int_facts_enter_time(call: CallbackQuery):
 def process_int_facts_time_sub(input_data: Union[str, Message], user: TelegramUser):
     """
     Обрабатывает ввод времени для подписки на интересные факты.
-    Можно вызывать либо с объектом Message, либо с текстовой строкой.
+    Принимает либо объект Message, либо строку.
+    Создаёт новую или обновляет существующую DailySubscription.
     """
     # Получаем текст из Message или из переданной строки
     if isinstance(input_data, Message):
@@ -75,12 +76,20 @@ def process_int_facts_time_sub(input_data: Union[str, Message], user: TelegramUs
 
     try:
         # Парсим строку в datetime.time; при неверном формате выбросит ValueError
-        dt = datetime.datetime.strptime(text, "%H:%M").time()
+        selected_time = datetime.datetime.strptime(text, "%H:%M").time()
     except ValueError:
-        # Неправильный формат, просим ещё раз
+        # Неправильный формат, просим ввести снова
         sent = SendMessages.IntFacts.incorrect_enter_time(user)
         bot.register_next_step_handler(sent, process_int_facts_time_sub, user)
         return
 
-    # Время распарсено, вызываем метод подписки
-    SendMessages.IntFacts.sub(user, dt)
+    # Время распарсено, создаём или обновляем подписку
+    try:
+        subscription = user.daily_subscription
+        subscription.send_time = selected_time
+        subscription.save(update_fields=["send_time"])
+        selected_time.strftime('%H:%M')
+    except DailySubscription.DoesNotExist:
+        DailySubscription.objects.create(user=user, send_time=selected_time)
+        
+    SendMessages.IntFacts.sub(user, selected_time)
