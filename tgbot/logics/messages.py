@@ -251,20 +251,22 @@ class SendMessages:
         def send_apod(user: TelegramUser):
             """
             Отправляет (или обновляет) сообщение с APOD сегодняшнего дня.
-            Если telegram_media_id уже есть, обновляет существующее фото через
-            SendMessages.update_or_replace_last_photo. Иначе скачивает картинку
-            и сохраняет новый telegram_media_id.
+            Логика сведена к одному вызову update_or_replace_last_photo:
+            - Если telegram_media_id уже есть, photo=telegram_media_id.
+            - Если нет, скачиваем новый буфер и передаём его.
+            После отправки (если file_id был пуст) сохраняем новый telegram_media_id.
             """
             chat_id = user.chat_id
             logger.debug(f"Apod.send_apod: user={user}")
 
-            # Получаем API-ключ из модели-одиночки ApodApiKey
+            # 1) Берём API-ключ из Singleton-модели
             api_key = ApodApiKey.get_solo().api_key
             if not api_key:
                 logger.error("Apod.send_apod: отсутствует API-ключ ApodApiKey")
                 bot.send_message(chat_id, "API-ключ APOD не задан.")
                 return
 
+            # 2) Инициализируем клиент
             try:
                 client = APODClient(api_key=api_key)
                 logger.info("Apod.send_apod: APODClient успешно инициализирован")
@@ -274,54 +276,52 @@ class SendMessages:
                 return
 
             try:
-                # 1) Получаем или обновляем запись ApodFile для сегодняшней даты
+                # 3) Получаем или создаём ApodFile для сегодняшнего дня (объект date — datetime.date)
                 apod_obj = client.get_or_update_today()
-                logger.info(f"Apod.send_apod: получен ApodFile для даты {apod_obj.date}")
+                logger.info(f"Apod.send_apod: получен ApodFile(date={apod_obj.date}, media_id={apod_obj.telegram_media_id})")
 
-                # 2) Если media_id уже есть, просто обновляем существующее сообщение с фото
+                # 4) Решаем, что передавать в send_photo:
+                #    если telegram_media_id уже есть — используем его (просто обновится caption/клавиатура),
+                #    иначе скачиваем картинку в память.
                 if apod_obj.telegram_media_id:
-                    logger.debug(f"Apod.send_apod: media_id={apod_obj.telegram_media_id} уже есть, обновляем фото")
-                    SendMessages.update_or_replace_last_photo(
-                        user=user,
-                        forced_delete=True,
-                        photo=apod_obj.telegram_media_id,
-                        caption=apod_obj.title or "",
-                        reply_markup=Keyboards.Apod.back_to_menu(),
-                    )
-                    return
+                    photo_source = apod_obj.telegram_media_id
+                    logger.debug("Apod.send_apod: Используем existing file_id для photo_source")
+                else:
+                    date_str = apod_obj.date.strftime("%Y-%m-%d")
+                    logger.info(f"Apod.send_apod: Скачиваем изображение для {date_str}")
+                    image_buffer = client.fetch_image_bytes(date_str)
+                    image_buffer.seek(0)
+                    photo_source = image_buffer
+                    logger.debug("Apod.send_apod: Буфер с изображением сформирован, переход к отправке")
 
-                # 3) Иначе скачиваем изображение в память
-                date_str = apod_obj.date.strftime("%Y-%m-%d")
-                logger.info(f"Apod.send_apod: скачиваем изображение для даты {date_str}")
-                image_buffer = client.fetch_image_bytes(date_str)
-                image_buffer.seek(0)
-
-                # 4) Отправляем фото, используя helper, и сохраняем новый file_id
-                logger.debug("Apod.send_apod: отправка нового фото")
-                def send_new():
-                    return bot.send_photo(chat_id, image_buffer, caption=apod_obj.title or "", reply_markup=Keyboards.Apod.back_to_menu())
-
-                def edit_existing(chat_id, message_id):
-                    media = InputMediaPhoto(media=image_buffer, caption=apod_obj.title or "")
-                    logger.debug(f"Apod.send_apod.edit_existing: редактируем сообщение message_id={message_id}")
-                    sent = bot.edit_message_media(chat_id=chat_id, message_id=message_id, media=media)
-                    return sent
-
-                result_msg = SendMessages._update_or_replace_last(
+                # 5) Один раз вызываем update_or_replace_last_photo. 
+                #    forced_delete=True — чтобы удалить предыдущее APOD‐сообщение.
+                #    caption=заголовок, reply_markup=клавиатура «назад в меню».
+                result_msg = SendMessages.update_or_replace_last_photo(
                     user=user,
                     forced_delete=True,
-                    send_func=send_new,
-                    edit_func=edit_existing,
+                    photo=photo_source,
+                    caption=apod_obj.title or "",
+                    reply_markup=Keyboards.Apod.back_to_menu(),
+                    parse_mode="Markdown"
                 )
-                if hasattr(result_msg, 'photo'):
-                    file_id = result_msg.photo[-1].file_id
-                    apod_obj.telegram_media_id = file_id
-                    apod_obj.save(update_fields=["telegram_media_id"])
-                    logger.info(f"Apod.send_apod: сохранён новый telegram_media_id={file_id} для даты {apod_obj.date}")
+
+                # 6) Если ранее не было telegram_media_id, надо сохранить новый file_id:
+                if not apod_obj.telegram_media_id:
+                    # Telegram возвращает list объектов PhotoSize; последний имеет актуальный file_id
+                    try:
+                        new_file_id = result_msg.photo[-1].file_id
+                        apod_obj.telegram_media_id = new_file_id
+                        apod_obj.save(update_fields=["telegram_media_id"])
+                        logger.info(f"Apod.send_apod: сохранён новый telegram_media_id={new_file_id}")
+                    except Exception as e:
+                        # На случай, если result_msg оказался не фотографией
+                        logger.error(f"Apod.send_apod: не удалось сохранить новый file_id: {e}")
 
             except APODClientError as e:
                 logger.error(f"Apod.send_apod: ошибка при получении APOD: {e}")
                 bot.send_message(chat_id, f"Ошибка при получении APOD: {e}")
-            except Exception as e:
+
+            except Exception:
                 logger.exception("Apod.send_apod: внутренняя ошибка при отправке APOD")
                 bot.send_message(chat_id, "Произошла внутренняя ошибка при отправке APOD.")
