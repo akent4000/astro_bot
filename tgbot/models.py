@@ -278,8 +278,8 @@ class QuizTopic(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Темы тестов'
-        verbose_name_plural = 'Тема тестов'
+        verbose_name = 'Тема квизов'
+        verbose_name_plural = 'Темы квизов'
 
     def __str__(self):
         return self.title
@@ -293,8 +293,8 @@ class QuizLevel(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Категория тестов'
-        verbose_name_plural = 'Категории тестов'
+        verbose_name = 'Категория квизов'
+        verbose_name_plural = 'Категории квизов'
 
     def __str__(self):
         return self.title
