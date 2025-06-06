@@ -210,7 +210,7 @@ class Keyboards:
                 btn = InlineKeyboardButton(text=article.title, url=article.link)
                 markup.add(btn)
 
-            return Keyboards._add_menu(Keyboards._add_back(markup, Keyboards.build_callback_data(CallbackData.ARTICLES_SECTION, {CallbackData.ARTICLES_SECTION: article_subsection.section.id})))
+            return Keyboards._add_menu(Keyboards._add_back(markup, Keyboards.build_callback_data(CallbackData.ARTICLES_SECTION, {CallbackData.ARTICLES_SECTION_ID: article_subsection.section.id})))
         
     class Quizzes:
         @staticmethod
