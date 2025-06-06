@@ -161,7 +161,7 @@ class SentMessage(models.Model):
 
 
 class InterestingFacts(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название')
+    title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название')
     description = models.TextField(verbose_name='Текст факта')
 
     @property
@@ -176,7 +176,7 @@ class InterestingFacts(models.Model):
         return self.title or self.description[:50] or "Без названия"
 
 class ArticlesSection(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название раздела статей')
+    title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название раздела статей')
 
     def __str__(self):
         return self.title or "Раздел без названия"
@@ -187,7 +187,7 @@ class ArticlesSection(models.Model):
 
 
 class ArticlesSubsection(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название подраздела статей')
+    title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название подраздела статей')
     section = models.ForeignKey(
         ArticlesSection,
         related_name='subsections',
@@ -208,7 +208,7 @@ class ArticlesSubsection(models.Model):
 
 
 class Article(models.Model):
-    title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название статьи')
+    title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название статьи')
     link = models.CharField(max_length=255, blank=True, null=True, verbose_name='Ссылка на статью')
     subsection = models.ForeignKey(
         ArticlesSubsection,
@@ -228,7 +228,7 @@ class Article(models.Model):
 
 class QuizTopic(models.Model):
     title = models.CharField(
-        max_length=50,
+        max_length=64,
         unique=True,
         verbose_name='Название темы квиза',
     )
@@ -242,7 +242,7 @@ class QuizTopic(models.Model):
 
 class QuizLevel(models.Model):
     title = models.CharField(
-        max_length=50,
+        max_length=64,
         unique=True,
         verbose_name='Название категории квиза',
         help_text='Например: Начальный уровень, Средний уровень, Продвинутый'
@@ -258,7 +258,7 @@ class QuizLevel(models.Model):
 
 class Quiz(models.Model):
     title = models.CharField(
-        max_length=50,
+        max_length=64,
         blank=True,
         null=True,
         verbose_name='Название квиза',
