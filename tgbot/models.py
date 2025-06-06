@@ -347,7 +347,7 @@ class Glossary(SingletonModel):
         verbose_name_plural = 'Глоссарий'
 
     def __str__(self):
-        return self.link
+        return self.link or ""
     
 class ApodFile(models.Model):
     """
