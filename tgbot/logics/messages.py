@@ -401,7 +401,7 @@ class SendMessages:
                 user,
                 False,
                 text=text,
-                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                reply_markup=Keyboards.IntFacts.back_and_main_menu(),
                 parse_mode="Markdown"
             )
         
@@ -413,7 +413,7 @@ class SendMessages:
                 user,
                 False,
                 text=Messages.INT_FACTS_UNSUB,
-                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                reply_markup=Keyboards.IntFacts.back_and_main_menu(),
                 parse_mode="Markdown"
             )
         
