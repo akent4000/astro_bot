@@ -1,4 +1,5 @@
 import datetime
+from typing import Union
 from telebot.types import CallbackQuery
 from tgbot.dispatcher import get_main_bot
 bot = get_main_bot()
@@ -7,6 +8,7 @@ from tgbot.logics.messages import SendMessages
 from tgbot.models import ArticlesSection, ArticlesSubsection, DailySubscription, QuizTopic, QuizLevel, Quiz, TelegramUser
 from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
 from tgbot.handlers.utils import getCallbackNameFromCall
+from telebot.types import Message
 
 # Обработчик для INT_FACTS (главное меню IntFacts)
 @bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS)
@@ -60,16 +62,25 @@ def handle_int_facts_enter_time(call: CallbackQuery):
     sent = SendMessages.IntFacts.enter_time(user)
     bot.register_next_step_handler(sent, process_int_facts_time_sub, user)
 
-def process_int_facts_time_sub(message, user: TelegramUser):
-    text = message.text.strip()
+def process_int_facts_time_sub(input_data: Union[str, Message], user: TelegramUser):
+    """
+    Обрабатывает ввод времени для подписки на интересные факты.
+    Можно вызывать либо с объектом Message, либо с текстовой строкой.
+    """
+    # Получаем текст из Message или из переданной строки
+    if isinstance(input_data, Message):
+        text = input_data.text.strip()
+    else:
+        text = input_data.strip()
+
     try:
-        # Парсим строку в datetime; при неверном формате выбросит ValueError
-        dt = datetime.datetime.strptime(text, "%H:%M")
+        # Парсим строку в datetime.time; при неверном формате выбросит ValueError
+        dt = datetime.datetime.strptime(text, "%H:%M").time()
     except ValueError:
         # Неправильный формат, просим ещё раз
         sent = SendMessages.IntFacts.incorrect_enter_time(user)
         bot.register_next_step_handler(sent, process_int_facts_time_sub, user)
         return
 
-    # Дата получена и распарсена, вызываем нужный метод
+    # Время распарсено, вызываем метод подписки
     SendMessages.IntFacts.sub(user, dt)
