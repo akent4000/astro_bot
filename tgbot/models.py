@@ -50,7 +50,7 @@ class ApodApiKey(SingletonModel):
         verbose_name_plural = 'APOD API ключ'
 
     def __str__(self):
-        return self.api_key
+        return "".join(self.api_key)
 
 class TelegramBotToken(models.Model):
     """Модель для хранения токена бота"""
