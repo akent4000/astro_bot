@@ -183,7 +183,8 @@ class InterestingFact(models.Model):
         verbose_name_plural = 'Отправленные сообщения'
 
     def __str__(self):
-        return self.title or self.description[:50] or "Без названия"
+        from tgbot.logics.telegraph_helper import parse_telegraph_title
+        return parse_telegraph_title(self.link) or "Без названия"
 
 class ArticlesSection(models.Model):
     title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название раздела статей')
@@ -234,7 +235,8 @@ class Article(models.Model):
     )
 
     def __str__(self):
-        return self.title or self.link[:50] or "Статья без названия"
+        from tgbot.logics.telegraph_helper import parse_telegraph_title
+        return parse_telegraph_title(self.link) or "Статья без названия"
 
     class Meta:
         verbose_name = 'Статья'
