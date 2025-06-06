@@ -4,6 +4,8 @@ import time
 import re
 from typing import Optional, Iterable, Union
 
+import requests
+
 from tgbot.dispatcher import get_main_bot
 bot = get_main_bot()
 

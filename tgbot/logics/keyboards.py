@@ -1,3 +1,4 @@
+from tgbot.logics.telegraph_helper import parse_telegraph_title
 from tgbot.models import ArticlesSection, ArticlesSubsection, Glossary, QuizTopic, QuizLevel, Quiz
 from telebot.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from tgbot.logics.constants import *
@@ -207,7 +208,8 @@ class Keyboards:
             markup = InlineKeyboardMarkup()
 
             for article in articles:
-                btn = InlineKeyboardButton(text=article.title, url=article.link)
+                title = parse_telegraph_title(article.link)
+                btn = InlineKeyboardButton(text=title, url=article.link)
                 markup.add(btn)
 
             return Keyboards._add_menu(Keyboards._add_back(markup, Keyboards.build_callback_data(CallbackData.ARTICLES_SECTION, {CallbackData.ARTICLES_SECTION_ID: article_subsection.section.id})))
