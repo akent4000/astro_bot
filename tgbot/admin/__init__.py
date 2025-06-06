@@ -7,3 +7,4 @@ from .glossary import *
 from .articles import *
 from .int_facts import *
 from .bot_config import *
+from .quizzes import *
