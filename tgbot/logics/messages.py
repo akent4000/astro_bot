@@ -4,6 +4,7 @@ from typing import Optional, Iterable, Union
 
 from tgbot.dispatcher import bot
 
+from tgbot.logics.apod_api import APODClient, APODClientError
 from tgbot.logics.keyboards import *
 from tgbot.logics.text_helper import escape_markdown, get_mention, safe_markdown_mention
 from tgbot.models import *
@@ -156,7 +157,50 @@ class SendMessages:
                 parse_mode="Markdown"
             )
 
-        
+    class Apod:
+        def send_apod_to_user(user):
+            """
+            Отправляет пользователю APOD сегодняшнего дня.
+            Если telegram_media_id уже есть, шлёт по нему, иначе скачивает картинку
+            и сохраняет новый telegram_media_id.
+            """
+            chat_id = user.chat_id
+
+            # Получаем API-ключ из модели-одиночки ApodApiKey
+            api_key = ApodApiKey.get_solo().api_key
+            try:
+                client = APODClient(api_key=api_key)
+            except APODClientError as e:
+                bot.send_message(chat_id, f"Не удалось инициализировать APOD-клиент: {e}")
+                return
+
+            try:
+                # Получаем или обновляем запись ApodFile для сегодняшней даты
+                apod_obj = client.get_or_update_today()
+
+                # Если media_id уже сохранён, отправляем по нему
+                if apod_obj.telegram_media_id:
+                    bot.send_photo(chat_id, apod_obj.telegram_media_id, caption=apod_obj.title or "")
+                    return
+
+                # Иначе скачиваем изображение в память
+                date_str = apod_obj.date.strftime("%Y-%m-%d")
+                image_buffer = client.fetch_image_bytes(date_str)
+                image_buffer.seek(0)
+
+                # Отправляем в Telegram, получаем file_id и сохраняем его
+                sent_msg = bot.send_photo(chat_id, image_buffer, caption=apod_obj.title or "")
+                file_id = sent_msg.photo[-1].file_id
+
+                apod_obj.telegram_media_id = file_id
+                apod_obj.save(update_fields=["telegram_media_id"])
+
+            except APODClientError as e:
+                bot.send_message(chat_id, f"Ошибка при получении APOD: {e}")
+            except Exception:
+                bot.send_message(chat_id, "Произошла внутренняя ошибка при отправке APOD.")
+                # Можно логировать traceback через logger, если нужно
+                # logger.exception(e)        
 
 
 

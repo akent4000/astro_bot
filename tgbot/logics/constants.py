@@ -73,10 +73,10 @@ class ButtonNames:
     GLOSSARY = "Глоссарий"
 
 class Urls:
-    GLOSSARY = "https://telegra.ph/"
-
-class Constants:
     pass
+class Constants:
+    NASA_APOD_ENDPOINT = "https://api.nasa.gov/planetary/apod"
+
 
 class Messages:
     MENU_MESSAGE = "Меню"

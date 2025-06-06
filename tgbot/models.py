@@ -38,6 +38,19 @@ class Configuration(SingletonModel):
     def __str__(self):
         return "Конфигурация бота"
 
+class ApodApiKey(SingletonModel):
+    api_key = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='API ключ для доступа к NASA APOD API',
+    )
+
+    class Meta:
+        verbose_name = 'APOD API ключ'
+        verbose_name_plural = 'APOD API ключ'
+
+    def __str__(self):
+        return self.link
 
 class TelegramBotToken(models.Model):
     """Модель для хранения токена бота"""
@@ -321,3 +334,56 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.text
+
+class Glossary(SingletonModel):
+    link = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Ссылка на глоссарий',
+    )
+
+    class Meta:
+        verbose_name = 'Глоссарий'
+        verbose_name_plural = 'Глоссарий'
+
+    def __str__(self):
+        return self.link
+    
+class ApodFile(models.Model):
+    """
+    Модель для хранения метаданных APOD (Astronomy Picture of the Day) и telegram_media_id,
+    чтобы не загружать изображение заново, если оно уже отправлено в Telegram.
+    """
+    date = models.DateField(
+        unique=True,
+        verbose_name="Дата APOD",
+        help_text="Дата снимка в формате ГГГГ-ММ-ДД"
+    )
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Заголовок"
+    )
+    explanation = models.TextField(
+        blank=True,
+        verbose_name="Описание"
+    )
+    telegram_media_id = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Telegram media_id",
+        help_text="ID изображения, полученный при отправке в Telegram"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата добавления"
+    )
+
+    class Meta:
+        verbose_name = "APOD-файл"
+        verbose_name_plural = "APOD-файлы"
+        ordering = ["-date"]
+
+    def __str__(self):
+        return f"APOD {self.date} — {self.title or 'Без названия'}"

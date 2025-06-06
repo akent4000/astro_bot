@@ -402,3 +402,12 @@ class SentMessageAdmin(admin.ModelAdmin):
     list_display = ('id', 'message_id', 'telegram_user', 'created_at')
     search_fields = ('message_id', 'telegram_user__chat_id', 'telegram_user__username')
     list_filter = ('telegram_user', 'created_at')
+
+##############################
+# APOD API Key Admin (Singleton)
+##############################
+@admin.register(ApodApiKey)
+class ApodApiKeyAdmin(SingletonModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('api_key',)}),
+    )

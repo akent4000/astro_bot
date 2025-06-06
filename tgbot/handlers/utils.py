@@ -53,14 +53,6 @@ def handle_int_facts_enter_time(call: CallbackQuery):
         return
     # Логика для запроса времени у пользователя
 
-# Обработчик для APOD
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.APOD)
-def handle_apod(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-    # Логика для отправки сегодняшнего APOD
-
 # Обработчик для ARTICLES (главное меню статей)
 @bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.ARTICLES)
 def handle_articles(call: CallbackQuery):

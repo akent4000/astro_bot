@@ -1,4 +1,4 @@
-from tgbot.models import ArticlesSection, ArticlesSubsection, QuizTopic, QuizLevel, Quiz
+from tgbot.models import ArticlesSection, ArticlesSubsection, Glossary, QuizTopic, QuizLevel, Quiz
 from telebot.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from tgbot.logics.constants import *
 from urllib.parse import urlencode
@@ -72,7 +72,7 @@ class Keyboards:
             )
             glossary = InlineKeyboardButton(
                 text=ButtonNames.GLOSSARY,
-                url=Urls.GLOSSARY
+                url=Glossary.get_solo().link
             )
 
             markup.add(moon_calc)
