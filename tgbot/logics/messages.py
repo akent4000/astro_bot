@@ -344,12 +344,12 @@ class SendMessages:
         def today(user: TelegramUser):
             moscow_tz = ZoneInfo('Europe/Moscow')
             today_moscow = datetime.datetime.now(moscow_tz).date()
-            fact = InterestingFact.objects.get(date_to_mailing=today_moscow)
+            fact = InterestingFact.objects.filter(date_to_mailing__date=today_moscow).first()
             if fact is None:
                 text = Messages.INT_FACTS_FACT_TODAY_NOT_FOUND
             else:
                 text = Messages.INT_FACTS_FACT.format(id=fact.id)
-            logger.debug(f"IntFacts.today: user={user}")
+            logger.debug(f"IntFacts.today: user={user}, fact={fact}")
 
             return SendMessages.update_or_replace_last_message(
                 user,
