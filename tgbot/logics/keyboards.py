@@ -122,7 +122,7 @@ class Keyboards:
 
             today = InlineKeyboardButton(
                 text=ButtonNames.TODAY,
-                callback_data=CallbackData.INT_FACTS
+                callback_data=CallbackData.INT_FACTS_TODAY
             )
             sub = InlineKeyboardButton(
                 text=ButtonNames.INT_FACTS_SUB,
