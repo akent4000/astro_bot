@@ -45,7 +45,7 @@ def get_main_bot() -> SyncBot:
     Возвращает «главный» бот (SyncBot), инициализируя его при первом вызове.
     Если в Configuration.test_mode включен тестовый режим, токены меняются местами.
     """
-    global _main_bot, _test_bot
+    global _main_bot
 
     if _main_bot is not None:
         return _main_bot
@@ -54,12 +54,11 @@ def get_main_bot() -> SyncBot:
     main_token = TelegramBotToken.get_main_bot_token()
     test_token = TelegramBotToken.get_test_bot_token()
 
-    # Если у нас включён test_mode, то меняем их местами (тестовый бот работает как главный и наоборот)
     try:
         config = Configuration.get_solo()
         if config.test_mode:
             if test_token:
-                main_token, test_token = test_token, main_token
+                main_token = test_token
                 logger.info("Test mode enabled — swapped main and test tokens.")
             else:
                 logger.warning("Test mode enabled, but test_token is empty → using main_token unchanged.")
@@ -75,20 +74,34 @@ def get_main_bot() -> SyncBot:
     return _main_bot
 
 
-def get_test_bot() -> SyncBot | None:
+def get_main_bot() -> SyncBot:
     """
-    Возвращает «тестовый» бот (SyncBot), инициализируя его при первом вызове.
-    Если тестовый токен не задан, возвращает None.
+    Возвращает «главный» бот (SyncBot), инициализируя его при первом вызове.
+    Если в Configuration.test_mode включен тестовый режим, токены меняются местами.
     """
     global _test_bot
+
     if _test_bot is not None:
         return _test_bot
 
+    # Сначала читаем «основной» и «тестовый» токены
+    main_token = TelegramBotToken.get_main_bot_token()
     test_token = TelegramBotToken.get_test_bot_token()
+
+    try:
+        config = Configuration.get_solo()
+        if config.test_mode:
+            if test_token:
+                test_token = main_token
+                logger.info("Test mode enabled — swapped main and test tokens.")
+            else:
+                logger.warning("Test mode enabled, but test_token is empty → using main_token unchanged.")
+    except Exception:
+        # Если Configuration ещё не создана, просто логируем и продолжаем с base-токеном
+        logger.warning("Cannot fetch Configuration singleton; proceeding with main_token as is.")
+
     if not test_token:
-        logger.info("Test bot token is empty → test_bot will be None.")
-        return None
+        raise RuntimeError("Main bot token is not defined in TelegramBotToken table.")
 
     _test_bot = _initialize_bot(test_token)
     logger.info("Test SyncBot instance created.")
-    return _test_bot

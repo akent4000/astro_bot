@@ -20,6 +20,11 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
+telegraph_validator = RegexValidator(
+    regex=r'^https?://telegra\.ph/.*$',
+    message='Ссылка должна вести на страницу telegra.ph (например: https://telegra.ph/...).',
+    code='invalid_telegraph_link'
+)
 
 class Configuration(SingletonModel):
     """
@@ -161,8 +166,12 @@ class SentMessage(models.Model):
 
 
 class InterestingFacts(models.Model):
-    title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название')
-    description = models.TextField(verbose_name='Текст факта')
+    link = models.CharField(
+        max_length=500,
+        verbose_name='Ссылка на факт в telegraph',
+        validators=[telegraph_validator],
+        help_text='Укажите URL вида https://telegra.ph/...'
+    )
 
     @property
     def text_to_send(self):
@@ -208,8 +217,12 @@ class ArticlesSubsection(models.Model):
 
 
 class Article(models.Model):
-    title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название статьи')
-    link = models.CharField(max_length=255, blank=True, null=True, verbose_name='Ссылка на статью')
+    link = models.CharField(
+        max_length=500,
+        verbose_name='Ссылка на статью в telegraph',
+        validators=[telegraph_validator],
+        help_text='Укажите URL вида https://telegra.ph/...'
+    )
     subsection = models.ForeignKey(
         ArticlesSubsection,
         related_name="articles",
@@ -336,10 +349,10 @@ class Choice(models.Model):
 
 class Glossary(SingletonModel):
     link = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-        verbose_name='Ссылка на глоссарий',
+        max_length=500,
+        verbose_name='Ссылка на глоссарий в telegraph',
+        validators=[telegraph_validator],
+        help_text='Укажите URL вида https://telegra.ph/...'
     )
 
     class Meta:
