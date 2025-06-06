@@ -36,6 +36,6 @@ class ArticlesSectionAdmin(admin.ModelAdmin):
 
 @admin.register(Article)
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ("title", "subsection", "link")
+    list_display = ("subsection", "link")
     list_filter = ("subsection__section", "subsection")
-    search_fields = ("title", "link")
+    search_fields = ("link",)
