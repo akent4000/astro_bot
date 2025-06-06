@@ -347,6 +347,11 @@ class Question(models.Model):
         verbose_name='Пояснение к вопросу',
         help_text='Краткое пояснение правильного ответа после завершения теста'
     )
+    order = models.PositiveIntegerField(
+        verbose_name='Порядок вопроса',
+        help_text='Определяет порядок вопросов в квизе',
+        default=0
+    )
 
     class Meta:
         verbose_name = 'Вопрос'
@@ -370,6 +375,11 @@ class Choice(models.Model):
         verbose_name='Правильный ответ',
         help_text='Установите True для всех корректных вариантов'
     )
+    order = models.PositiveIntegerField(
+        verbose_name='Порядок варианта',
+        default=0,
+        help_text='Определяет, в каком порядке показывать варианты'
+    )
 
     class Meta:
         verbose_name = 'Вариант ответа'
@@ -377,6 +387,97 @@ class Choice(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class UserQuizSession(models.Model):
+    """
+    Хранит информацию о сессии прохождения квиза конкретным пользователем.
+    """
+
+    user = models.ForeignKey(
+        TelegramUser,
+        on_delete=models.CASCADE,
+        related_name='quiz_sessions',
+        verbose_name='Пользователь'
+    )
+    quiz = models.ForeignKey(
+        Quiz,
+        on_delete=models.CASCADE,
+        related_name='sessions',
+        verbose_name='Квиз'
+    )
+    started_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Начало сессии'
+    )
+    finished_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        verbose_name='Дата завершения'
+    )
+
+    class Meta:
+        verbose_name = 'Сессия квиза'
+        verbose_name_plural = 'Сессии квизов'
+        unique_together = ('user', 'quiz')
+
+    def __str__(self):
+        return f"Сессия {self.quiz} для {self.user}"
+
+    @property
+    def is_finished(self) -> bool:
+        return self.finished_at is not None
+
+    def finish(self):
+        """
+        Отметить сессию как завершённую.
+        """
+        if not self.finished_at:
+            self.finished_at = timezone.now()
+            self.save()
+
+    def score(self) -> int:
+        """
+        Подсчитать количество правильных ответов в этой сессии.
+        """
+        return self.answers.filter(choice__is_correct=True).count()
+
+
+class UserQuizAnswer(models.Model):
+    """
+    Хранит ответ пользователя на конкретный вопрос в рамках сессии.
+    """
+
+    session = models.ForeignKey(
+        UserQuizSession,
+        on_delete=models.CASCADE,
+        related_name='answers',
+        verbose_name='Сессия квиза'
+    )
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE,
+        related_name='user_answers',
+        verbose_name='Вопрос'
+    )
+    choice = models.ForeignKey(
+        Choice,
+        on_delete=models.CASCADE,
+        related_name='+',
+        verbose_name='Выбранный вариант'
+    )
+    answered_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Дата ответа'
+    )
+
+    class Meta:
+        verbose_name = 'Ответ на вопрос'
+        verbose_name_plural = 'Ответы на вопросы'
+        unique_together = ('session', 'question')
+
+    def __str__(self):
+        return f"Сессия {self.session.id} | Вопрос {self.question.id} → «{self.choice.text}»"
 
 class Glossary(SingletonModel):
     link = models.CharField(

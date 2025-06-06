@@ -39,13 +39,16 @@ class CallbackData:
 
     # Quizzes
     QUIZZES = "qz"
-    QUIZZES_TOPIC = f"{QUIZZES}_t"                      # "qz_t"
-    QUIZZES_TOPIC_ID = f"{QUIZZES_TOPIC}_{ID}"          # "qz_t_i"
-    QUIZZES_LEVEL = f"{QUIZZES}_l"                      # "qz_l"
-    QUIZZES_LEVEL_ID = f"{QUIZZES_LEVEL}_{ID}"          # "qz_l_i"
-    QUIZZES_QUIZ = f"{QUIZZES}_q"                       # "qz_q"
-    QUIZZES_QUIZ_ID = f"{QUIZZES_QUIZ}_{ID}"            # "qz_q_i"
-
+    QUIZZES_TOPIC = f"{QUIZZES}_t"                                              # "qz_t"
+    QUIZZES_TOPIC_ID = f"{QUIZZES_TOPIC}_{ID}"                                  # "qz_t_i"
+    QUIZZES_LEVEL = f"{QUIZZES}_l"                                              # "qz_l"
+    QUIZZES_LEVEL_ID = f"{QUIZZES_LEVEL}_{ID}"                                  # "qz_l_i"
+    QUIZZES_QUIZ = f"{QUIZZES}_q"                                               # "qz_q"
+    QUIZZES_QUIZ_ID = f"{QUIZZES_QUIZ}_{ID}"                                    # "qz_q_i"
+    QUIZZES_QUIZ_QUESTION = f"{QUIZZES_QUIZ}_q"                                 # "qz_q_q"
+    QUIZZES_QUIZ_QUESTION_ID = f"{QUIZZES_QUIZ_QUESTION}_{ID}"                  # "qz_q_q_i"
+    QUIZZES_QUIZ_QUESTION_CHOISE = f"{QUIZZES_QUIZ_QUESTION}_c"                 # "qz_q_q_c"
+    QUIZZES_QUIZ_QUESTION_CHOISE_ID = f"{QUIZZES_QUIZ_QUESTION_CHOISE}_{ID}"    # "qz_q_q_c_i"
 
 class Commands:
     START = "start"
@@ -70,6 +73,7 @@ class ButtonNames:
     ARTICLES = "📰 Статьи"
 
     QUIZZES = "❓ Квизы"
+    QUIZZES_BACK_TO_CHOISE_QUIZ = "⬅️ Назад к выбору квиза"
 
     GLOSSARY = "📖 Глоссарий"
 
@@ -100,6 +104,12 @@ class Messages:
     ARTICLES_SECTION = "📰 Выберите раздел"
     ARTICLES_SUBSECTION = "📂 Выберите подраздел"
     ARTICLES_ARTICLE = "📄 Список статей по этой теме:"
+
+    QUIZZES_TOPIC = "📚 Выберите тему"
+    QUIZZES_LEVEL = "🎓 Выберите уровень"
+    QUIZZES_QUIZ = "Выберите квиз"
+    QUIZZES_QUIZ_QUESTION = "❓ Вопрос №{n}\n{description}"
+    QUIZZES_QUIZ_END = "Вы правильно ответили на {n} из {n_questions}\n"
 
     USER_BLOCKED = "❌ Вы заблокированы и не можете пользоваться ботом."
     USER_NOT_FOUND_ERROR = "❌ Ошибка: пользователь не найден."

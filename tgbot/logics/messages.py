@@ -450,3 +450,65 @@ class SendMessages:
                 reply_markup=Keyboards.Articles.choose_article(article_subsection),
                 parse_mode="Markdown"
             )
+    
+    class Quizzes:
+        @staticmethod
+        def choose_topic(user: TelegramUser):
+            logger.debug(f"Quizzes.choose_topic: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.QUIZZES_TOPIC,
+                reply_markup=Keyboards.Quizzes.choose_topic(),
+                parse_mode="Markdown"
+            )
+        
+        @staticmethod
+        def choose_level(user: TelegramUser, quiz_topic: QuizTopic):
+            logger.debug(f"Quizzes.choose_level: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.QUIZZES_LEVEL,
+                reply_markup=Keyboards.Quizzes.choose_level(quiz_topic),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def choose_quiz(user: TelegramUser, quiz_topic: QuizTopic, quiz_level: QuizLevel):
+            logger.debug(f"Quizzes.choose_quiz: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.QUIZZES_QUIZ,
+                reply_markup=Keyboards.Quizzes.choose_quiz(quiz_topic, quiz_level),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def question(user: TelegramUser, question: Question):
+            logger.debug(f"Quizzes.question: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
+                reply_markup=Keyboards.Quizzes.question(question),
+                parse_mode="Markdown"
+            )
+        
+        @staticmethod
+        def end(user: TelegramUser, quiz_session: UserQuizSession):
+            logger.debug(f"Quizzes.end: user={user}")
+            text = Messages.QUIZZES_QUIZ_END.format(n=quiz_session.score(), n_questions=len(quiz_session.quiz.questions or []))
+
+            for question in quiz_session.quiz.qestions or []:
+                text += question.text
+                text += question
+
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=,
+                reply_markup=Keyboards.Quizzes.end(quiz_session),
+                parse_mode="Markdown"
+            )

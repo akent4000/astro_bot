@@ -1,5 +1,6 @@
 from telebot.types import CallbackQuery
 from tgbot.dispatcher import get_main_bot
+from tgbot.logics.messages import SendMessages
 bot = get_main_bot()
 from tgbot.logics.constants import CallbackData, Messages
 from tgbot.models import ArticlesSection, ArticlesSubsection, QuizTopic, QuizLevel, Quiz
@@ -11,7 +12,7 @@ def handle_quizzes(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    # Логика для отображения списка тем квизов
+    SendMessages.MoonCalc.menu(user)
 
 # Обработчик для QUIZZES_TOPIC (с параметром topic_id)
 @bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_TOPIC)

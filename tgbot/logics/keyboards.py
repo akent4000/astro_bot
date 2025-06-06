@@ -1,5 +1,5 @@
 from tgbot.logics.telegraph_helper import parse_telegraph_title
-from tgbot.models import ArticlesSection, ArticlesSubsection, Glossary, InterestingFact, QuizTopic, QuizLevel, Quiz
+from tgbot.models import ArticlesSection, ArticlesSubsection, Choice, Glossary, InterestingFact, Question, QuizTopic, QuizLevel, Quiz, UserQuizSession
 from telebot.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from tgbot.logics.constants import *
 from urllib.parse import urlencode
@@ -279,3 +279,37 @@ class Keyboards:
                 }
             )
             return Keyboards._add_menu(Keyboards._add_back(markup, back_cb))
+
+        @staticmethod
+        def question(question: Question) -> InlineKeyboardMarkup:
+            markup = InlineKeyboardMarkup()
+
+            choices = Choice.objects.filter(question=question).order_by("order")
+            if choices.exists():
+                for choice in choices:
+                    callback = Keyboards.build_callback_data(CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE, {CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE_ID: choice.id})
+                    btn = InlineKeyboardButton(text=choice.text, callback_data=callback)
+                    markup.add(btn)
+
+            back_cb = Keyboards.build_callback_data(
+                CallbackData.QUIZZES_LEVEL, 
+                {
+                    CallbackData.QUIZZES_QUIZ_ID: question.quiz.level.id,
+                    CallbackData.QUIZZES_TOPIC_ID: question.quiz.topic.id,
+                })
+            btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=back_cb)
+            markup.add(btn)
+            return Keyboards._add_menu(markup)
+        
+        @staticmethod
+        def end(quiz_session: UserQuizSession) -> InlineKeyboardMarkup:
+            markup = InlineKeyboardMarkup()
+            back_cb = Keyboards.build_callback_data(
+                CallbackData.QUIZZES_LEVEL, 
+                { 
+                    CallbackData.QUIZZES_QUIZ_ID: quiz_session.quiz.level.id,
+                    CallbackData.QUIZZES_TOPIC_ID: quiz_session.quiz.topic.id
+                })
+            btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=back_cb)
+            markup.add(btn)
+            return Keyboards._add_menu(markup)

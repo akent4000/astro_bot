@@ -24,6 +24,9 @@ def word_number_case_days(number_of_days):
 def word_number_case_hours(number_of_days):
     return f"{word_number_case(int(number_of_days), 'час', 'часа', 'часов', addNumber=True)}"
 
+def word_number_case_question(number_of_questions):
+    return f"{word_number_case(int(number_of_questions), 'вопрос', 'вопроса', 'вопросов', addNumber=True)}"
+
 class Partial(dict):
     def __missing__(self, key):
         # если ключ не найден — возвращаем сам плейсхолдер
