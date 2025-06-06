@@ -391,3 +391,37 @@ class SendMessages:
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
                 parse_mode="Markdown"
             )
+        
+    class Articles:
+        @staticmethod
+        def choose_section(user: TelegramUser):
+            logger.debug(f"Articles.choose_section: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.ARTICLES_SECTION,
+                reply_markup=Keyboards.Articles.choose_section(),
+                parse_mode="Markdown"
+            )
+        
+        @staticmethod
+        def choose_subsection(user: TelegramUser, article_section: ArticlesSection):
+            logger.debug(f"Articles.choose_section: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.ARTICLES_SUBSECTION,
+                reply_markup=Keyboards.Articles.choose_subsection(article_section),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def choose_article(user: TelegramUser, article_subsection: ArticlesSubsection):
+            logger.debug(f"Articles.choose_article: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.ARTICLES_ARTICLE,
+                reply_markup=Keyboards.Articles.choose_article(article_subsection),
+                parse_mode="Markdown"
+            )

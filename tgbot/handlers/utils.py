@@ -23,62 +23,6 @@ def handle_int_facts_enter_time(call: CallbackQuery):
         return
     # Логика для запроса времени у пользователя
 
-# Обработчик для ARTICLES (главное меню статей)
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES)
-def handle_articles(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-    # Логика для отображения списка разделов статей
-
-# Обработчик для ARTICLES_SECTION (с параметром section_id)
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES_SECTION)
-def handle_articles_section(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-
-    params = extract_query_params(call)
-    section_id = extract_int_param(call, params, CallbackData.ARTICLES_SECTION_ID, Messages.MISSING_PARAMETERS_ERROR)
-    if section_id is None:
-        return
-
-    # Здесь можно получить объект раздела:
-    # section = ArticlesSection.objects.filter(id=section_id).first()
-    # И дальше — логика для отображения подразделов
-
-# Обработчик для ARTICLES_SUBSECTION (с параметром subsection_id)
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES_SUBSECTION)
-def handle_articles_subsection(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-
-    params = extract_query_params(call)
-    subsection_id = extract_int_param(call, params, CallbackData.ARTICLES_SUBSECTION_ID, Messages.MISSING_PARAMETERS_ERROR)
-    if subsection_id is None:
-        return
-
-    # Здесь можно получить объект подраздела:
-    # subsection = ArticlesSubsection.objects.filter(id=subsection_id).first()
-    # И дальше — логика для отображения списка статей
-
-# Обработчик для ARTICLES_ARTICLE (с параметром article_id)
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES_ARTICLE)
-def handle_articles_article(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-
-    params = extract_query_params(call)
-    article_id = extract_int_param(call, params, CallbackData.ARTICLES_ARTICLE_ID, Messages.MISSING_PARAMETERS_ERROR)
-    if article_id is None:
-        return
-
-    # Здесь можно получить объект статьи:
-    # article = Article.objects.filter(id=article_id).first()
-    # И дальше — логика для отправки самой статьи или ссылки
-
 # Обработчик для QUIZZES (главное меню квизов)
 @bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.QUIZZES)
 def handle_quizzes(call: CallbackQuery):

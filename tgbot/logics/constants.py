@@ -90,10 +90,15 @@ class Messages:
 
     INT_FACTS = "Интересные факты"
 
+    ARTICLES_SECTION = "Выберите раздел"
+    ARTICLES_SUBSECTION = "Выберите подраздел"
+    ARTICLES_ARTICLE = "Список статей по этой теме:"
+
     USER_BLOCKED = "❌ Вы заблокированы и не можете пользоваться ботом."
     USER_NOT_FOUND_ERROR = "Ошибка: пользователь не найден."
     MISSING_PARAMETERS_ERROR = "Ошибка: отсутствуют параметры."
     INCORRECT_VALUE_ERROR = "Ошибка: неверное значение для {key}."
+    NOT_FOUND_ERROR = "{item} не найден."
 
 class CommandsNames:
     START = "Старт бота и показ меню"
