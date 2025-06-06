@@ -340,7 +340,7 @@ class SendMessages:
             )
 
         @staticmethod
-        def today(user: TelegramUser):
+        def today(user: TelegramUser, forced_delete: bool = False):
             today_moscow = datetime.datetime.now(ZoneInfo(Constants.ZONE_INFO)).date()
             fact = InterestingFact.objects.filter(date_to_mailing=today_moscow).first()
             if fact is None:
@@ -352,7 +352,7 @@ class SendMessages:
 
             return SendMessages.update_or_replace_last_message(
                 user,
-                False,
+                forced_delete,
                 text=text,
                 reply_markup=Keyboards.IntFacts.today(fact),
                 parse_mode="Markdown"

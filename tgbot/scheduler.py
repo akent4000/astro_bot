@@ -45,23 +45,7 @@ def run_scheduler():
 
                 for sub in subs:
                     user = sub.user
-                    if fact:
-                        # Отправляем пользователю факт через готовый метод
-                        try:
-                            SendMessages.IntFacts.today(user)
-                            logger.info(f"Scheduler: отправлен факт (id={fact.id}) пользователю {user}")
-                        except Exception as e2:
-                            logger.error(f"Scheduler: не удалось отправить факт пользователю {user}: {e2}")
-                    else:
-                        # Если факта на сегодня нет, присылаем уведомление об этом
-                        try:
-                            dispatcher.get_main_bot().send_message(
-                                chat_id=user.chat_id,
-                                text=Messages.INT_FACTS_FACT_TODAY_NOT_FOUND
-                            )
-                            logger.info(f"Scheduler: уведомление об отсутствии факта отправлено {user}")
-                        except Exception as e3:
-                            logger.error(f"Scheduler: не удалось отправить уведомление об отсутствии факта {user}: {e3}")
+                    SendMessages.IntFacts.today(user, True)
 
             # Высчитываем, сколько секунд ждать до следующей «ровной» минуты
             next_minute = (now_moscow.replace(second=0, microsecond=0) + timedelta(minutes=1))
