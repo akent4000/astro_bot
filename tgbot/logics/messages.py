@@ -30,61 +30,113 @@ from tgbot.models import SentMessage, TelegramUser
 
 class SendMessages:
     @staticmethod
-    def update_or_replace_last_message(user: TelegramUser, forced_delete: bool, text: str, **kwargs):
+    def _update_or_replace_last(user: TelegramUser,
+                                forced_delete: bool,
+                                send_func,
+                                edit_func):
         """
-        Пытается изменить последнее отправленное пользователю сообщение.
-        Если редактирование не удалось (например, сообщение уже не редактируется),
-        удаляет старое и отправляет новое.
+        Вспомогательный метод: пытается отредактировать последнее сообщение,
+        если не получается — удаляет его и отправляет новое.
         
-        Параметры:
-            user: экземпляр TelegramUser, которому нужно обновить сообщение.
-            text: новый текст сообщения (передается в edit_message_text или send_message).
-            **kwargs: любые дополнительные аргументы для методов bot.edit_message_text / bot.send_message,
-                    например reply_markup, parse_mode и т.д.
+        send_func: функция без аргументов, возвращает объект Message при отправке
+        edit_func: функция(chat_id, message_id) — возвращает объект Message при редактировании
         """
-        # Получаем последнее отправленное сообщение
-
+        # 1) Принудительное удаление всех старых сообщений
         if forced_delete:
             try:
-                ids_qs = SentMessage.objects.filter(telegram_user=user)
-                message_ids = list(ids_qs.values_list("message_id", flat=True))
-                bot.delete_messages(user.chat_id, message_ids)
-                ids_qs.delete()
+                qs = SentMessage.objects.filter(telegram_user=user)
+                ids = list(qs.values_list("message_id", flat=True))
+                bot.delete_messages(user.chat_id, ids)
+                qs.delete()
             except Exception:
                 SentMessage.objects.filter(telegram_user=user).delete()
 
-        last_sent = SentMessage.objects.filter(telegram_user=user).order_by('-created_at').first()
-        
-        # Если нет предыдущих сообщений, просто отправляем новое
-        if not last_sent:
-            new_msg = bot.send_message(chat_id=user.chat_id, text=text, **kwargs)
+        # 2) Последнее отправленное сообщение
+        last = SentMessage.objects.filter(telegram_user=user).order_by("-created_at").first()
+
+        # 3) Если нет — просто отправляем новое и сохраняем
+        if not last:
+            new_msg = send_func()
             SentMessage.objects.create(telegram_user=user, message_id=new_msg.message_id)
             return new_msg
 
         chat_id = user.chat_id
-        message_id = last_sent.message_id
+        msg_id = last.message_id
 
+        # 4) Пытаемся отредактировать
         try:
-            # Пытаемся отредактировать текст последнего сообщения
-            sent = bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=text,
-                **kwargs
-            )
-            return sent
+            edited = edit_func(chat_id, msg_id)
+            return edited
         except ApiException:
-            # Если не получилось редактировать (например, сообщение удалено или слишком старое),
-            # удаляем старое и отправляем новое.
+            # 5) Если редактирование не удалось — удаляем старое и отправляем новое
             try:
-                bot.delete_message(chat_id=chat_id, message_id=message_id)
+                bot.delete_message(chat_id=chat_id, message_id=msg_id)
             except ApiException:
-                # Игнорируем ошибку удаления, если сообщение уже удалено
-                pass
+                pass  # если уже удалено или нельзя удалить
 
-            new_msg = bot.send_message(chat_id=chat_id, text=text, **kwargs)
+            new_msg = send_func()
             SentMessage.objects.create(telegram_user=user, message_id=new_msg.message_id)
             return new_msg
+
+    @staticmethod
+    def update_or_replace_last_message(user: TelegramUser,
+                                       forced_delete: bool,
+                                       text: str,
+                                       **kwargs):
+        """
+        Обновляет или заменяет последнее текстовое сообщение.
+        
+        Параметры:
+            user: TelegramUser
+            forced_delete: если True — удаляем всё перед попыткой редактирования
+            text: текст для send_message / edit_message_text
+            **kwargs: 'reply_markup', 'parse_mode' и т.д.
+        """
+        send_fn = lambda: bot.send_message(chat_id=user.chat_id, text=text, **kwargs)
+        edit_fn = lambda chat_id, message_id: bot.edit_message_text(
+            chat_id=chat_id, message_id=message_id, text=text, **kwargs
+        )
+        return SendMessages._update_or_replace_last(user, forced_delete, send_fn, edit_fn)
+
+    @staticmethod
+    def update_or_replace_last_photo(user: TelegramUser,
+                                     forced_delete: bool,
+                                     photo,
+                                     caption: str = "",
+                                     **kwargs):
+        """
+        Обновляет или заменяет последнее сообщение с фото.
+        
+        Параметры:
+            user: TelegramUser
+            forced_delete: если True — удаляем всё перед попыткой редактирования
+            photo: file_id (str) или объект BytesIO/файла или URL
+            caption: подпись для фото
+            **kwargs: 'reply_markup', 'parse_mode' и т.д.
+        """
+        # Функция для отправки нового фото
+        send_fn = lambda: bot.send_photo(
+            chat_id=user.chat_id, photo=photo, caption=caption, **kwargs
+        )
+
+        # Функция для редактирования существующего фото
+        def edit_fn(chat_id, message_id):
+            media = InputMediaPhoto(media=photo, caption=caption)
+            sent = bot.edit_message_media(
+                chat_id=chat_id, message_id=message_id, media=media
+            )
+            # Если нужно обновить подпись или клавиатуру, делаем edit_message_caption
+            caption_kwargs = {k: v for k, v in kwargs.items() if k in ("reply_markup", "parse_mode")}
+            if caption_kwargs:
+                bot.edit_message_caption(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    caption=caption,
+                    **caption_kwargs
+                )
+            return sent
+
+        return SendMessages._update_or_replace_last(user, forced_delete, send_fn, edit_fn)
 
 
     class MainMenu:
@@ -158,11 +210,17 @@ class SendMessages:
             )
 
     class Apod:
-        def send_apod_to_user(user):
+        @staticmethod
+        def send_apod(user: TelegramUser):
             """
-            Отправляет пользователю APOD сегодняшнего дня.
-            Если telegram_media_id уже есть, шлёт по нему, иначе скачивает картинку
+            Отправляет (или обновляет) сообщение с APOD сегодняшнего дня.
+            Если telegram_media_id уже есть, обновляет существующее фото через
+            SendMessages.update_or_replace_last_photo. Иначе скачивает картинку
             и сохраняет новый telegram_media_id.
+
+            Параметры:
+                user: экземпляр TelegramUser
+                forced_delete: если True — удаляются все прошлые сообщения перед отправкой
             """
             chat_id = user.chat_id
 
@@ -175,34 +233,45 @@ class SendMessages:
                 return
 
             try:
-                # Получаем или обновляем запись ApodFile для сегодняшней даты
+                # 1) Получаем или обновляем запись ApodFile для сегодняшней даты
                 apod_obj = client.get_or_update_today()
 
-                # Если media_id уже сохранён, отправляем по нему
+                # 2) Если media_id уже есть, просто обновляем существующее сообщение с фото
                 if apod_obj.telegram_media_id:
-                    bot.send_photo(chat_id, apod_obj.telegram_media_id, caption=apod_obj.title or "")
+                    SendMessages.update_or_replace_last_photo(
+                        user=user,
+                        forced_delete=True,
+                        photo=apod_obj.telegram_media_id,
+                        caption=apod_obj.title or ""
+                    )
                     return
 
-                # Иначе скачиваем изображение в память
+                # 3) Иначе скачиваем изображение в память
                 date_str = apod_obj.date.strftime("%Y-%m-%d")
                 image_buffer = client.fetch_image_bytes(date_str)
                 image_buffer.seek(0)
 
-                # Отправляем в Telegram, получаем file_id и сохраняем его
-                sent_msg = bot.send_photo(chat_id, image_buffer, caption=apod_obj.title or "")
-                file_id = sent_msg.photo[-1].file_id
+                # 4) Отправляем фото, используя helper, и сохраняем новый file_id
+                def send_new():
+                    return bot.send_photo(chat_id, image_buffer, caption=apod_obj.title or "")
 
-                apod_obj.telegram_media_id = file_id
-                apod_obj.save(update_fields=["telegram_media_id"])
+                def edit_existing(chat_id, message_id):
+                    media = InputMediaPhoto(media=image_buffer, caption=apod_obj.title or "")
+                    sent = bot.edit_message_media(chat_id=chat_id, message_id=message_id, media=media)
+                    return sent
+
+                SendMessages._update_or_replace_last(
+                    user=user,
+                    forced_delete=True,
+                    send_func=send_new,
+                    edit_func=edit_existing
+                )
 
             except APODClientError as e:
                 bot.send_message(chat_id, f"Ошибка при получении APOD: {e}")
             except Exception:
                 bot.send_message(chat_id, "Произошла внутренняя ошибка при отправке APOD.")
-                # Можно логировать traceback через logger, если нужно
-                # logger.exception(e)        
 
 
 
-
-    
+        

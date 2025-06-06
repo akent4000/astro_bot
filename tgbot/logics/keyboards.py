@@ -44,6 +44,12 @@ class Keyboards:
         menu_btn = InlineKeyboardButton(text=ButtonNames.MENU, callback_data=CallbackData.MENU)
         markup.add(menu_btn)
         return markup
+    
+    @staticmethod
+    def _add_menu_forced_delete(markup: InlineKeyboardMarkup):
+        menu_btn = InlineKeyboardButton(text=ButtonNames.MENU, callback_data=CallbackData.MENU_FORCED_DELETE)
+        markup.add(menu_btn)
+        return markup
 
     class MainMenu:
         @staticmethod
@@ -167,7 +173,7 @@ class Keyboards:
         @staticmethod
         def back_to_menu():
             markup = InlineKeyboardMarkup()
-            return Keyboards._add_menu(markup)
+            return Keyboards._add_menu_forced_delete(markup)
 
         
     class Articles:

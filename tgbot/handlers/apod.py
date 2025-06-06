@@ -17,4 +17,4 @@ def handle_apod(call: CallbackQuery):
     if not user:
         return
 
-    SendMessages.Apod.send_apod_to_user(user)
+    SendMessages.Apod.send_apod(user)

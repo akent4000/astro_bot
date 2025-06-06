@@ -5,7 +5,8 @@ class CallbackData:
     # Основные действия
     BACK = "b"
     MENU = "m"
-
+    MENU_FORCED_DELETE = "mfd"
+    
     # Параметры времени
     TODAY = "t"
     ENTER_DATE = "d"

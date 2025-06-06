@@ -11,3 +11,11 @@ def handle_int_facts(call: CallbackQuery):
     if not user:
         return
     SendMessages.MainMenu.menu(user)
+
+# Обработчик для MENU (главное меню)
+@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.MENU_FORCED_DELETE)
+def handle_int_facts(call: CallbackQuery):
+    user = get_user_from_call(call)
+    if not user:
+        return
+    SendMessages.MainMenu.menu(user, forced_delete=True)
