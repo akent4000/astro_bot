@@ -1,5 +1,5 @@
 from tgbot.logics.telegraph_helper import parse_telegraph_title
-from tgbot.models import ArticlesSection, ArticlesSubsection, Glossary, QuizTopic, QuizLevel, Quiz
+from tgbot.models import ArticlesSection, ArticlesSubsection, Glossary, InterestingFact, QuizTopic, QuizLevel, Quiz
 from telebot.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from tgbot.logics.constants import *
 from urllib.parse import urlencode
@@ -139,6 +139,19 @@ class Keyboards:
 
             return Keyboards._add_menu(markup)
 
+        @staticmethod
+        def today(int_fact: InterestingFact):
+            markup = InlineKeyboardMarkup()
+            
+            if int_fact is not None:
+                link = InlineKeyboardButton(
+                    text=parse_telegraph_title(int_fact.link),
+                    callback_data=CallbackData.INT_FACTS_TODAY,
+                    url=int_fact.link
+                )
+                markup.add(link)
+
+            return Keyboards._add_menu(Keyboards._add_back(markup, CallbackData.INT_FACTS))
         
         @staticmethod
         def choose_time():
