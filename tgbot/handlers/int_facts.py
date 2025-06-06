@@ -6,12 +6,11 @@ bot = get_main_bot()
 from tgbot.logics.constants import ButtonNames, CallbackData, Messages
 from tgbot.logics.messages import SendMessages
 from tgbot.models import ArticlesSection, ArticlesSubsection, DailySubscription, QuizTopic, QuizLevel, Quiz, TelegramUser
-from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
-from tgbot.handlers.utils import getCallbackNameFromCall
+from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param, get_callback_name_from_call
 from telebot.types import Message
 
 # Обработчик для INT_FACTS (главное меню IntFacts)
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS)
 def handle_int_facts(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -19,7 +18,7 @@ def handle_int_facts(call: CallbackQuery):
     SendMessages.IntFacts.menu(user)
 
 # Обработчик для INT_FACTS_TODAY
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_TODAY)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_TODAY)
 def handle_int_facts_today(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -27,7 +26,7 @@ def handle_int_facts_today(call: CallbackQuery):
     SendMessages.IntFacts.today(user)
 
 # Обработчик для INT_FACTS_SUB
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_SUB)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_SUB)
 def handle_int_facts_sub(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -35,7 +34,7 @@ def handle_int_facts_sub(call: CallbackQuery):
     SendMessages.IntFacts.choose_time_or_default(user)
 
 # Обработчик для INT_FACTS_UNSUB
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_UNSUB)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_UNSUB)
 def handle_int_facts_unsub(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -46,7 +45,7 @@ def handle_int_facts_unsub(call: CallbackQuery):
     SendMessages.IntFacts.unsub(user)
 
 # Обработчик для INT_FACTS_DEFAULT_TIME
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_DEFAULT_TIME)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_DEFAULT_TIME)
 def handle_int_facts_default_time(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -54,7 +53,7 @@ def handle_int_facts_default_time(call: CallbackQuery):
     process_int_facts_time_sub(ButtonNames.INT_FACTS_DEFAULT_TIME, user)
 
 # Обработчик для INT_FACTS_ENTER_TIME
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_ENTER_TIME)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_ENTER_TIME)
 def handle_int_facts_enter_time(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -91,5 +90,5 @@ def process_int_facts_time_sub(input_data: Union[str, Message], user: TelegramUs
         selected_time.strftime('%H:%M')
     except DailySubscription.DoesNotExist:
         DailySubscription.objects.create(user=user, send_time=selected_time)
-        
+
     SendMessages.IntFacts.sub(user, selected_time)

@@ -48,3 +48,6 @@ def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message
     except ValueError:
         bot.answer_callback_query(call.id, Messages.INCORRECT_VALUE_ERROR.format(key=key))
         return None
+    
+def get_callback_name_from_call(call: CallbackQuery):
+    return call.data.split("?", 1)[0]

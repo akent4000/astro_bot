@@ -3,13 +3,12 @@ from telebot.types import CallbackQuery
 from tgbot.dispatcher import get_main_bot
 bot = get_main_bot()
 from tgbot.logics.constants import CallbackData, Messages
-from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
+from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param, get_callback_name_from_call
 from tgbot.logics.messages import SendMessages
 from tgbot.models import TelegramUser
-from tgbot.handlers.utils import getCallbackNameFromCall
 
 # Обработчик для MOON_CALC (главное меню MoonCalc)
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.MOON_CALC)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC)
 def handle_moon_calc(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -17,7 +16,7 @@ def handle_moon_calc(call: CallbackQuery):
     SendMessages.MoonCalc.menu(user)
 
 # Обработчик для MOON_CALC_TODAY
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.MOON_CALC_TODAY)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC_TODAY)
 def handle_moon_calc_today(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -26,7 +25,7 @@ def handle_moon_calc_today(call: CallbackQuery):
 
 
 # Обработчик для MOON_CALC_ENTER_DATE
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.MOON_CALC_ENTER_DATE)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC_ENTER_DATE)
 def handle_moon_calc_enter_date(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
