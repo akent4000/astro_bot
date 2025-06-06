@@ -299,7 +299,7 @@ class SendMessages:
                 # 4) Отправляем фото, используя helper, и сохраняем новый file_id
                 logger.debug("Apod.send_apod: отправка нового фото")
                 def send_new():
-                    return bot.send_photo(chat_id, image_buffer, caption=apod_obj.title or "")
+                    return bot.send_photo(chat_id, image_buffer, caption=apod_obj.title or "", reply_markup=Keyboards.Apod.back_to_menu())
 
                 def edit_existing(chat_id, message_id):
                     media = InputMediaPhoto(media=image_buffer, caption=apod_obj.title or "")
@@ -312,7 +312,6 @@ class SendMessages:
                     forced_delete=True,
                     send_func=send_new,
                     edit_func=edit_existing,
-                    reply_markup=Keyboards.Apod.back_to_menu(),
                 )
                 if hasattr(result_msg, 'photo'):
                     file_id = result_msg.photo[-1].file_id
