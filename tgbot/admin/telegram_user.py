@@ -13,6 +13,7 @@ from tgbot.forms import SendMessageForm
 from tgbot.logics.constants import Messages
 from tgbot.logics.administrator_actions import mass_mailing
 
+@admin.register(TelegramUser)
 class TelegramUserAdmin(admin.ModelAdmin):
     list_display = (
         'chat_id',
