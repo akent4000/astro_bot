@@ -209,7 +209,7 @@ class ArticlesSubsection(models.Model):
 
 class Article(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название статьи')
-    link = models.TextField(verbose_name='Ссылка на статью')
+    link = models.CharField(max_length=255, blank=True, null=True, verbose_name='Ссылка на статью')
     subsection = models.ForeignKey(
         ArticlesSubsection,
         related_name="articles",
