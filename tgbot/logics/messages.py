@@ -1,3 +1,5 @@
+# tgbot/logics/messages.py
+
 import time
 import re
 from typing import Optional, Iterable, Union
@@ -20,7 +22,7 @@ from tgbot.logics.moon_calc import moon_phase
 # Убедимся, что папка logs существует
 Path("logs").mkdir(parents=True, exist_ok=True)
 
-# Лог-файл будет называться так же, как модуль, например send_messages.py → logs/send_messages.log
+# Лог-файл будет называться так же, как модуль, например messages.py → logs/messages.log
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
@@ -52,7 +54,7 @@ class SendMessages:
                 qs = SentMessage.objects.filter(telegram_user=user)
                 ids = list(qs.values_list("message_id", flat=True))
                 if ids:
-                    logger.debug(f"_update_or_replace_last: попытка bot.delete_messages для ids={ids}")
+                    logger.debug(f"_update_or_replace_last: пытаемся bot.delete_messages ids={ids}")
                     bot.delete_messages(chat_id, ids)
                 qs.delete()
                 logger.info(f"_update_or_replace_last: удалены все записи SentMessage для user={user}.")
@@ -82,7 +84,7 @@ class SendMessages:
 
         # 4) Пытаемся отредактировать
         try:
-            logger.debug(f"_update_or_replace_last: попытка редактирования сообщения message_id={msg_id} для user={user}.")
+            logger.debug(f"_update_or_replace_last: пробуем редактировать message_id={msg_id} для user={user}.")
             edited = edit_func(chat_id, msg_id)
             logger.info(f"_update_or_replace_last: успешно отредактировано сообщение message_id={msg_id} для user={user}.")
             return edited
@@ -90,7 +92,7 @@ class SendMessages:
             logger.warning(f"_update_or_replace_last: не удалось отредактировать message_id={msg_id}, ошибка: {e}")
             # 5) Если редактирование не удалось — удаляем старое и отправляем новое
             try:
-                logger.debug(f"_update_or_replace_last: попытка bot.delete_message для message_id={msg_id}.")
+                logger.debug(f"_update_or_replace_last: пытаемся bot.delete_message message_id={msg_id}.")
                 bot.delete_message(chat_id=chat_id, message_id=msg_id)
                 logger.info(f"_update_or_replace_last: удалено старое сообщение message_id={msg_id}.")
             except ApiException as ex:
@@ -143,22 +145,19 @@ class SendMessages:
             **kwargs: 'reply_markup', 'parse_mode' и т.д.
         """
         logger.debug(f"update_or_replace_last_photo: user={user}, forced_delete={forced_delete}, caption={caption}")
-        # Функция для отправки нового фото
         send_fn = lambda: bot.send_photo(
             chat_id=user.chat_id, photo=photo, caption=caption, **kwargs
         )
 
-        # Функция для редактирования существующего фото
         def edit_fn(chat_id, message_id):
-            logger.debug(f"update_or_replace_last_photo.edit_fn: попытка редактирования media для message_id={message_id}")
+            logger.debug(f"update_or_replace_last_photo.edit_fn: пытаемся редактировать media для message_id={message_id}")
             media = InputMediaPhoto(media=photo, caption=caption)
             sent = bot.edit_message_media(
                 chat_id=chat_id, message_id=message_id, media=media
             )
-            # Если нужно обновить подпись или клавиатуру, делаем edit_message_caption
             caption_kwargs = {k: v for k, v in kwargs.items() if k in ("reply_markup", "parse_mode")}
             if caption_kwargs:
-                logger.debug(f"update_or_replace_last_photo.edit_fn: обновление подписи/клавиатуры для message_id={message_id}")
+                logger.debug(f"update_or_replace_last_photo.edit_fn: обновляем подпись/клавиатуру для message_id={message_id}")
                 bot.edit_message_caption(
                     chat_id=chat_id,
                     message_id=message_id,
@@ -198,8 +197,9 @@ class SendMessages:
             moscow_tz = ZoneInfo('Europe/Moscow')
             today_moscow = datetime.datetime.now(moscow_tz).date()
             formatted_date = today_moscow.strftime("%d.%m.%Y")
-            text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=moon_phase(today_moscow))
-            logger.debug(f"MoonCalc.today: user={user}, date={formatted_date}, phase={moon_phase(today_moscow)}")
+            phase = moon_phase(today_moscow)
+            text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=phase)
+            logger.debug(f"MoonCalc.today: user={user}, date={formatted_date}, phase={phase}")
 
             return SendMessages.update_or_replace_last_message(
                 user,
@@ -234,8 +234,9 @@ class SendMessages:
         @staticmethod
         def date(user: TelegramUser, date: datetime.datetime):
             formatted_date = date.date().strftime("%d.%m.%Y")
-            text = Messages.MOON_CALC_MSG.format(date=formatted_date, moon_phase=moon_phase(date))
-            logger.debug(f"MoonCalc.date: user={user}, date={formatted_date}, phase={moon_phase(date)}")
+            phase = moon_phase(date)
+            text = Messages.MOON_CALC_MSG.format(date=formatted_date, moon_phase=phase)
+            logger.debug(f"MoonCalc.date: user={user}, date={formatted_date}, phase={phase}")
 
             return SendMessages.update_or_replace_last_message(
                 user,

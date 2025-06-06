@@ -1,10 +1,8 @@
 # tgbot/logics/apod_api.py
 
-import os
 import requests
 from datetime import datetime
 from io import BytesIO
-from django.core.files.base import ContentFile
 from django.db import transaction
 
 from tgbot.models import ApodApiKey, ApodFile
@@ -34,7 +32,7 @@ class APODClient:
     def __init__(self, api_key: str = None):
         """
         Args:
-            api_key (str, optional): API-ключ NASA. Если не передан, попытается взять из модели ApodApiKey.
+            api_key (str, optional): API-ключ NASA. Если не передан, берётся из модели ApodApiKey.
         """
         if api_key:
             self.api_key = api_key
@@ -53,51 +51,50 @@ class APODClient:
 
     def get_or_update_today(self) -> ApodFile:
         """
-        Получает объект ApodFile для сегодняшней даты. Если его нет, запрашивает API и сохраняет метаданные.
-        Возвращает:
-            ApodFile: экземпляр модели, в котором заполняются date, title, explanation и (возможно) telegram_media_id.
+        Получает объект ApodFile для сегодняшней даты (UTC). 
+        Если его нет, создаёт и запрашивает API для заполнения title/explanation.
+        Если модель уже есть и в ней уже есть telegram_media_id, возвращает сразу.
+        Иначе обновляет title/explanation из API.
+        Возвращает ApodFile.date как объект date.
         """
-        today_str = datetime.utcnow().strftime("%Y-%m-%d")
-        logger.debug(f"get_or_update_today: Начало для даты {today_str}")
+        # Формируем чисто Python-объект datetime.date
+        today_date = datetime.utcnow().date()
+        logger.debug(f"get_or_update_today: Работаем с датой {today_date.isoformat()}")
 
         with transaction.atomic():
-            apod_obj, created = ApodFile.objects.get_or_create(date=today_str)
+            apod_obj, created = ApodFile.objects.get_or_create(date=today_date)
             if created:
-                logger.info(f"get_or_update_today: Создан новый объект ApodFile для даты {today_str}")
+                logger.info(f"get_or_update_today: Создан новый ApodFile для {today_date}")
             else:
-                logger.debug(f"get_or_update_today: Найден существующий объект ApodFile для даты {today_str}")
+                logger.debug(f"get_or_update_today: Найден ApodFile для {today_date}")
 
+            # Если уже есть media_id, нет смысла перезапрашивать API
             if not created and apod_obj.telegram_media_id:
-                logger.info(f"get_or_update_today: Объект для {today_str} уже имеет telegram_media_id={apod_obj.telegram_media_id}, возврат без изменений.")
+                logger.info(f"get_or_update_today: У ApodFile для {today_date} уже есть telegram_media_id={apod_obj.telegram_media_id}")
                 return apod_obj
 
-            # Если создан или media_id отсутствует, запрашиваем данные из API
+            # Иначе запрашиваем метаданные из NASA API
+            date_str = today_date.strftime("%Y-%m-%d")
             try:
-                data = self._fetch_apod_data_for_date(today_str)
-                logger.debug(f"get_or_update_today: Получены данные из API для {today_str}: {data}")
+                data = self._fetch_apod_data_for_date(date_str)
+                logger.debug(f"get_or_update_today: Получены данные из API для {date_str}: {data}")
             except APODClientError as e:
-                logger.error(f"get_or_update_today: Ошибка при запросе API для {today_str}: {e}")
+                logger.error(f"get_or_update_today: Ошибка запроса к API для {date_str}: {e}")
                 raise
 
-            # Обновляем поля title и explanation
             apod_obj.title = data.get("title", "")
             apod_obj.explanation = data.get("explanation", "")
             apod_obj.save(update_fields=["title", "explanation"])
-            logger.info(f"get_or_update_today: Обновлены метаданные для ApodFile {today_str} (title, explanation).")
+            logger.info(f"get_or_update_today: Обновлены title/explanation для ApodFile {today_date}")
+
             return apod_obj
 
 
     def fetch_image_bytes(self, date_str: str) -> BytesIO:
         """
-        Скачивает изображение APOD для указанной даты в оперативную память.
-        Args:
-            date_str (str): дата в формате 'YYYY-MM-DD'.
-        Returns:
-            BytesIO: байты изображения.
-        Raises:
-            APODClientError: если media_type != image или произошла сетевая ошибка.
+        Скачивает изображение APOD для указанной даты (string 'YYYY-MM-DD') в память.
         """
-        logger.debug(f"fetch_image_bytes: Запрос данных APOD для даты {date_str}")
+        logger.debug(f"fetch_image_bytes: Запрос API для даты {date_str}")
         data = self._fetch_apod_data_for_date(date_str)
 
         if data.get("media_type") != "image":
@@ -106,50 +103,44 @@ class APODClient:
             raise APODClientError(msg)
 
         image_url = data.get("hdurl") or data.get("url")
-        logger.info(f"fetch_image_bytes: Скачивание изображения по URL: {image_url}")
+        logger.info(f"fetch_image_bytes: Скачиваем изображение с {image_url}")
         try:
             img_resp = requests.get(image_url, stream=True, timeout=10)
             img_resp.raise_for_status()
         except requests.RequestException as e:
-            logger.error(f"fetch_image_bytes: Ошибка при скачивании изображения: {e}")
+            logger.error(f"fetch_image_bytes: Ошибка при скачивании: {e}")
             raise APODClientError(f"Failed to download APOD image: {e}")
 
         buffer = BytesIO(img_resp.content)
-        logger.info(f"fetch_image_bytes: Успешно загружено изображение для {date_str}, размер {len(img_resp.content)} байт.")
+        logger.info(f"fetch_image_bytes: Изображение загружено, размер {len(img_resp.content)} байт")
         return buffer
 
 
     def _fetch_apod_data_for_date(self, date_str: str) -> dict:
         """
-        Запрос к NASA APOD API для указанной даты.
-        Args:
-            date_str (str): дата 'YYYY-MM-DD'
-        Returns:
-            dict: ответ API.
-        Raises:
-            APODClientError: если статус != 200 или JSON некорректен.
+        Запрос к NASA APOD API за данными (json) для даты date_str.
         """
         endpoint = Constants.NASA_APOD_ENDPOINT
         params = {"api_key": self.api_key, "date": date_str}
-        logger.debug(f"_fetch_apod_data_for_date: Запрос к {endpoint} с параметрами {params}")
+        logger.debug(f"_fetch_apod_data_for_date: GET {endpoint}?{params}")
 
         try:
             resp = requests.get(endpoint, params=params, timeout=10)
             resp.raise_for_status()
-            logger.info(f"_fetch_apod_data_for_date: Получен ответ {resp.status_code} от API для {date_str}")
+            logger.info(f"_fetch_apod_data_for_date: Успешный ответ {resp.status_code} для {date_str}")
         except requests.RequestException as e:
-            logger.error(f"_fetch_apod_data_for_date: Сетевая ошибка при запросе API: {e}")
+            logger.error(f"_fetch_apod_data_for_date: Сетевая ошибка: {e}")
             raise APODClientError(f"Network error while fetching APOD: {e}")
 
         try:
             data = resp.json()
-            logger.debug(f"_fetch_apod_data_for_date: JSON ответ: {data}")
+            logger.debug(f"_fetch_apod_data_for_date: JSON payload: {data}")
         except ValueError:
-            logger.error(f"_fetch_apod_data_for_date: Не удалось распарсить JSON из ответа API.")
+            logger.error(f"_fetch_apod_data_for_date: Не удалось распарсить JSON для {date_str}")
             raise APODClientError("Failed to parse JSON from NASA APOD API.")
 
         if "media_type" not in data or "url" not in data:
-            logger.error(f"_fetch_apod_data_for_date: В ответе отсутствуют обязательные поля: media_type или url.")
+            logger.error(f"_fetch_apod_data_for_date: Ожидаемые поля отсутствуют в ответе: {data}")
             raise APODClientError("Unexpected APOD response structure.")
 
         return data
