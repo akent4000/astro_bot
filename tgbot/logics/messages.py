@@ -339,7 +339,7 @@ class SendMessages:
             )
 
         @staticmethod
-        def today(user: TelegramUser):
+        def today(user: TelegramUser, forced_delete: bool = False):
             moscow_tz = ZoneInfo('Europe/Moscow')
             today_moscow = datetime.datetime.now(moscow_tz).date()
             formatted_date = today_moscow.strftime("%d.%m.%Y")
@@ -349,7 +349,7 @@ class SendMessages:
 
             return SendMessages.update_or_replace_last_message(
                 user,
-                False,
+                forced_delete,
                 text=text,
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
                 parse_mode="Markdown"

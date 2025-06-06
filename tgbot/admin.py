@@ -430,3 +430,49 @@ class ApodFileAdmin(admin.ModelAdmin):
     search_fields = ('date', 'title')
     readonly_fields = ('created_at',)
     list_filter = ('date',)
+
+##############################
+# ArticleInline Admin
+##############################
+class ArticleInline(admin.TabularInline):
+    model = Article
+    fields = ("title", "link")
+    extra = 1
+    show_change_link = True
+
+##############################
+# ArticlesSubsection Admin
+##############################
+@admin.register(ArticlesSubsection)
+class ArticlesSubsectionAdmin(admin.ModelAdmin):
+    list_display = ("title", "section")
+    list_filter = ("section",)
+    search_fields = ("title",)
+    inlines = [ArticleInline]
+
+##############################
+# ArticlesSubsectionInline Admin
+##############################
+class ArticlesSubsectionInline(admin.TabularInline):
+    model = ArticlesSubsection
+    fields = ("title",)
+    extra = 1
+    show_change_link = True
+
+##############################
+# ArticlesSection Admin
+##############################
+@admin.register(ArticlesSection)
+class ArticlesSectionAdmin(admin.ModelAdmin):
+    list_display = ("title",)
+    search_fields = ("title",)
+    inlines = [ArticlesSubsectionInline]
+
+##############################ы
+# Article Admin
+##############################
+@admin.register(Article)
+class ArticleAdmin(admin.ModelAdmin):
+    list_display = ("title", "subsection", "link")
+    list_filter = ("subsection__section", "subsection")
+    search_fields = ("title", "link")

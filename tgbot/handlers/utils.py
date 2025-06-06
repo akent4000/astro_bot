@@ -4,9 +4,11 @@ from tgbot.logics.constants import CallbackData, Messages
 from tgbot.models import ArticlesSection, ArticlesSubsection, QuizTopic, QuizLevel, Quiz
 from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
 
+def getCallbackNameFromCall(call: CallbackQuery):
+    return call.data.split("?", 1)[0]
 
 # Обработчик для INT_FACTS_DEFAULT_TIME
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.INT_FACTS_DEFAULT_TIME)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_DEFAULT_TIME)
 def handle_int_facts_default_time(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -14,7 +16,7 @@ def handle_int_facts_default_time(call: CallbackQuery):
     # Логика для установки времени по умолчанию
 
 # Обработчик для INT_FACTS_ENTER_TIME
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.INT_FACTS_ENTER_TIME)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_ENTER_TIME)
 def handle_int_facts_enter_time(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -22,7 +24,7 @@ def handle_int_facts_enter_time(call: CallbackQuery):
     # Логика для запроса времени у пользователя
 
 # Обработчик для ARTICLES (главное меню статей)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.ARTICLES)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES)
 def handle_articles(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -30,7 +32,7 @@ def handle_articles(call: CallbackQuery):
     # Логика для отображения списка разделов статей
 
 # Обработчик для ARTICLES_SECTION (с параметром section_id)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.ARTICLES_SECTION)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES_SECTION)
 def handle_articles_section(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -46,7 +48,7 @@ def handle_articles_section(call: CallbackQuery):
     # И дальше — логика для отображения подразделов
 
 # Обработчик для ARTICLES_SUBSECTION (с параметром subsection_id)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.ARTICLES_SUBSECTION)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES_SUBSECTION)
 def handle_articles_subsection(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -62,7 +64,7 @@ def handle_articles_subsection(call: CallbackQuery):
     # И дальше — логика для отображения списка статей
 
 # Обработчик для ARTICLES_ARTICLE (с параметром article_id)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.ARTICLES_ARTICLE)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.ARTICLES_ARTICLE)
 def handle_articles_article(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -78,7 +80,7 @@ def handle_articles_article(call: CallbackQuery):
     # И дальше — логика для отправки самой статьи или ссылки
 
 # Обработчик для QUIZZES (главное меню квизов)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.QUIZZES)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.QUIZZES)
 def handle_quizzes(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -86,7 +88,7 @@ def handle_quizzes(call: CallbackQuery):
     # Логика для отображения списка тем квизов
 
 # Обработчик для QUIZZES_TOPIC (с параметром topic_id)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.QUIZZES_TOPIC)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.QUIZZES_TOPIC)
 def handle_quizzes_topic(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -102,7 +104,7 @@ def handle_quizzes_topic(call: CallbackQuery):
     # И далее — логика для отображения уровней
 
 # Обработчик для QUIZZES_LEVEL (с параметрами level_id и topic_id)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.QUIZZES_LEVEL)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.QUIZZES_LEVEL)
 def handle_quizzes_level(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
@@ -122,7 +124,7 @@ def handle_quizzes_level(call: CallbackQuery):
     # И далее — логика для отображения списка квизов
 
 # Обработчик для QUIZZES_QUIZ (с параметром quiz_id)
-@bot.callback_query_handler(func=lambda call: call.data.split("?", 1)[0] == CallbackData.QUIZZES_QUIZ)
+@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.QUIZZES_QUIZ)
 def handle_quizzes_quiz(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
