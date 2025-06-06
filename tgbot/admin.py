@@ -411,3 +411,31 @@ class ApodApiKeyAdmin(SingletonModelAdmin):
     fieldsets = (
         (None, {'fields': ('api_key',)}),
     )
+
+##############################
+# APOD API Key Admin (Singleton)
+##############################
+@admin.register(ApodApiKey)
+class ApodApiKeyAdmin(SingletonModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('api_key',)}),
+    )
+
+##############################
+# Glossary Admin (Singleton)
+##############################
+@admin.register(Glossary)
+class GlossaryAdmin(SingletonModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('link',)}),
+    )
+
+##############################
+# ApodFile Admin
+##############################
+@admin.register(ApodFile)
+class ApodFileAdmin(admin.ModelAdmin):
+    list_display = ('date', 'title', 'telegram_media_id', 'created_at')
+    search_fields = ('date', 'title')
+    readonly_fields = ('created_at',)
+    list_filter = ('date',)
