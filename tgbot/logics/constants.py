@@ -77,7 +77,7 @@ class Urls:
     pass
 class Constants:
     NASA_APOD_ENDPOINT = "https://api.nasa.gov/planetary/apod"
-
+    ZONE_INFO = "Europe/Moscow"
 
 class Messages:
     MENU_MESSAGE = "Меню"

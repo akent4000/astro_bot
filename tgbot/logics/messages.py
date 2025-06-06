@@ -196,8 +196,7 @@ class SendMessages:
 
         @staticmethod
         def today(user: TelegramUser):
-            moscow_tz = ZoneInfo('Europe/Moscow')
-            today_moscow = datetime.datetime.now(moscow_tz).date()
+            today_moscow = datetime.datetime.now(ZoneInfo(Constants.ZONE_INFO)).date()
             formatted_date = today_moscow.strftime("%d.%m.%Y")
             phase = moon_phase(today_moscow)
             text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=phase)
@@ -342,13 +341,13 @@ class SendMessages:
 
         @staticmethod
         def today(user: TelegramUser):
-            moscow_tz = ZoneInfo('Europe/Moscow')
-            today_moscow = datetime.datetime.now(moscow_tz).date()
-            fact = InterestingFact.objects.filter(date_to_mailing__date=today_moscow).first()
+            today_moscow = datetime.datetime.now(ZoneInfo(Constants.ZONE_INFO)).date()
+            fact = InterestingFact.objects.filter(date_to_mailing=today_moscow).first()
             if fact is None:
                 text = Messages.INT_FACTS_FACT_TODAY_NOT_FOUND
             else:
                 text = Messages.INT_FACTS_FACT.format(id=fact.id)
+
             logger.debug(f"IntFacts.today: user={user}, fact={fact}")
 
             return SendMessages.update_or_replace_last_message(
