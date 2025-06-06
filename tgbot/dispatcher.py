@@ -74,7 +74,7 @@ def get_main_bot() -> SyncBot:
     return _main_bot
 
 
-def get_main_bot() -> SyncBot:
+def get_test_bot() -> SyncBot:
     """
     Возвращает «главный» бот (SyncBot), инициализируя его при первом вызове.
     Если в Configuration.test_mode включен тестовый режим, токены меняются местами.

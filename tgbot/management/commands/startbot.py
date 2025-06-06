@@ -27,7 +27,7 @@ def _run_main_bot():
     bot = dispatcher.get_main_bot()
 
     # Подключаем все обработчики
-    from tgbot.handlers import commands, main_menu, moon_calc, apod, utils, int_facts, articles  # noqa: F401
+    from tgbot.handlers import commands, main_menu, moon_calc, apod, utils, int_facts, articles
 
     while True:
         try:
