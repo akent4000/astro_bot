@@ -6,3 +6,4 @@ from .apod import *
 from .glossary import *
 from .articles import *
 from .int_facts import *
+from .bot_config import *
