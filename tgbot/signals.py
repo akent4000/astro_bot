@@ -137,7 +137,7 @@ def configuration_pre_save(sender, instance, **kwargs):
 def _restart_service():
     try:
         result = subprocess.run(
-            ['sudo', 'systemctl', 'restart', 'bot'],
+            ['systemctl', 'restart', 'bot'],
             check=True,
             capture_output=True,
             text=True
