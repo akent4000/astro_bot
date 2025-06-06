@@ -352,6 +352,7 @@ class SendMessages:
 
             return SendMessages.update_or_replace_last_message(
                 user,
+                False,
                 text=text,
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
                 parse_mode="Markdown"
