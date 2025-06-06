@@ -311,7 +311,8 @@ class SendMessages:
                     user=user,
                     forced_delete=True,
                     send_func=send_new,
-                    edit_func=edit_existing
+                    edit_func=edit_existing,
+                    reply_markup=Keyboards.Apod.back_to_menu(),
                 )
                 if hasattr(result_msg, 'photo'):
                     file_id = result_msg.photo[-1].file_id
