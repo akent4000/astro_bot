@@ -325,3 +325,69 @@ class SendMessages:
             except Exception:
                 logger.exception("Apod.send_apod: внутренняя ошибка при отправке APOD")
                 bot.send_message(chat_id, "Произошла внутренняя ошибка при отправке APOD.")
+
+    class IntFacts:
+        @staticmethod
+        def menu(user: TelegramUser):
+            logger.debug(f"IntFacts.menu: user={user}")
+            SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.INT_FACTS,
+                reply_markup=Keyboards.IntFacts.menu(),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def today(user: TelegramUser):
+            moscow_tz = ZoneInfo('Europe/Moscow')
+            today_moscow = datetime.datetime.now(moscow_tz).date()
+            formatted_date = today_moscow.strftime("%d.%m.%Y")
+            phase = moon_phase(today_moscow)
+            text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=phase)
+            logger.debug(f"MoonCalc.today: user={user}, date={formatted_date}, phase={phase}")
+
+            return SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=text,
+                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def enter_date(user: TelegramUser):
+            logger.debug(f"MoonCalc.enter_date: user={user}")
+            return SendMessages.update_or_replace_last_message(
+                user,
+                True,
+                text=Messages.MOON_CALC_ENTER_DATE,
+                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def incorrect_enter_date(user: TelegramUser):
+            logger.debug(f"MoonCalc.incorrect_enter_date: user={user}")
+            return SendMessages.update_or_replace_last_message(
+                user,
+                True,
+                text=Messages.MOON_CALC_ENTER_DATE_INCORRECT,
+                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def date(user: TelegramUser, date: datetime.datetime):
+            formatted_date = date.date().strftime("%d.%m.%Y")
+            phase = moon_phase(date)
+            text = Messages.MOON_CALC_MSG.format(date=formatted_date, moon_phase=phase)
+            logger.debug(f"MoonCalc.date: user={user}, date={formatted_date}, phase={phase}")
+
+            return SendMessages.update_or_replace_last_message(
+                user,
+                True,
+                text=text,
+                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                parse_mode="Markdown"
+            )

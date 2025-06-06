@@ -6,7 +6,7 @@ class CallbackData:
     BACK = "b"
     MENU = "m"
     MENU_FORCED_DELETE = "mfd"
-    
+
     # Параметры времени
     TODAY = "t"
     ENTER_DATE = "d"
@@ -87,6 +87,8 @@ class Messages:
     MOON_CALC_TODAY = f"Сегодня {MOON_CALC_MSG}"
     MOON_CALC_ENTER_DATE = "Введите дату в формате дд.мм.гггг, например: 05.06.2025"
     MOON_CALC_ENTER_DATE_INCORRECT = "Неверный формат даты. Введите дату в формате дд.мм.гггг, например: 05.06.2025"
+
+    INT_FACTS = "Интересные факты"
 
     USER_BLOCKED = "❌ Вы заблокированы и не можете пользоваться ботом."
     USER_NOT_FOUND_ERROR = "Ошибка: пользователь не найден."
