@@ -51,7 +51,7 @@ def handle_int_facts_default_time(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    process_int_facts_time_sub({"text": ButtonNames.INT_FACTS_DEFAULT_TIME}, user)
+    process_int_facts_time_sub(ButtonNames.INT_FACTS_DEFAULT_TIME, user)
 
 # Обработчик для INT_FACTS_ENTER_TIME
 @bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_ENTER_TIME)
