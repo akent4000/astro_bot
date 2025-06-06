@@ -1,7 +1,5 @@
 from tgbot.models import TelegramUser
 import telebot
-from tgbot.dispatcher import get_main_bot
-bot = get_main_bot()
 import time
 from tgbot.logics.constants import *
 from pathlib import Path
@@ -13,6 +11,8 @@ log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
 def mass_mailing(admin: TelegramUser, users:list[TelegramUser]=None, text = None, ):
+    from tgbot.dispatcher import get_main_bot
+    bot = get_main_bot()
     msg = ""
     if text is not None and admin is not None:
         msg = f"{text}\n\n{admin.admin_signature or 'Администратор'}"
