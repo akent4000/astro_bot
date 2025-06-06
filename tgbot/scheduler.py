@@ -2,7 +2,8 @@
 
 import time
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from zoneinfo import ZoneInfo
 
 import pytz
 from loguru import logger
@@ -10,12 +11,9 @@ from loguru import logger
 from tgbot import dispatcher
 from tgbot.models import DailySubscription, InterestingFact
 from tgbot.logics.messages import SendMessages
-from tgbot.logics.constants import Messages
+from tgbot.logics.constants import Constants, Messages
 
-# Таймзона для рассылок — Москва
-MOSCOW_TZ = pytz.timezone("Europe/Moscow")
-
-
+#
 def run_scheduler():
     """
     Фоновая функция, которую запускают в отдельном потоке.
@@ -26,9 +24,12 @@ def run_scheduler():
 
     while True:
         try:
-            # Рассчитываем текущее московское время (UTC → UTC+3)
-            now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
-            now_moscow = now_utc.astimezone(MOSCOW_TZ)
+            # Получаем текущий UTC-время с tzinfo
+            now_utc = datetime.now(timezone.utc)
+
+            # Переводим в московский часовой пояс, взятый из Constants.ZONE_INFO
+            moscow_tz = ZoneInfo(Constants.ZONE_INFO)
+            now_moscow = now_utc.astimezone(moscow_tz)
 
             # Обрезаем секунды и миллисекунды
             current_time = now_moscow.time().replace(second=0, microsecond=0)
