@@ -165,17 +165,18 @@ class SentMessage(models.Model):
         verbose_name_plural = 'Отправленные сообщения'
 
 
-class InterestingFacts(models.Model):
+class InterestingFact(models.Model):
     link = models.CharField(
         max_length=500,
         verbose_name='Ссылка на факт в telegraph',
         validators=[telegraph_validator],
         help_text='Укажите URL вида https://telegra.ph/...'
     )
+    date_to_mailing = models.DateField(
+        verbose_name='Дата для рассылки этого факта',
+        help_text='Дата и время, когда факт будет отправлен подписчикам'
+    )
 
-    @property
-    def text_to_send(self):
-        pass
 
     class Meta:
         verbose_name = 'Отправленное сообщение'

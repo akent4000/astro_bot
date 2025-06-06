@@ -21,7 +21,7 @@ def handle_int_facts_today(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    # Логика для отправки факта на сегодня
+    SendMessages.IntFacts.today(user)
 
 # Обработчик для INT_FACTS_SUB
 @bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_SUB)

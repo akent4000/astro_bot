@@ -341,17 +341,18 @@ class SendMessages:
             )
 
         @staticmethod
-        def today(user: TelegramUser, forced_delete: bool = False):
+        def today(user: TelegramUser):
             moscow_tz = ZoneInfo('Europe/Moscow')
             today_moscow = datetime.datetime.now(moscow_tz).date()
-            formatted_date = today_moscow.strftime("%d.%m.%Y")
-            phase = moon_phase(today_moscow)
-            text = Messages.MOON_CALC_TODAY.format(date=formatted_date, moon_phase=phase)
-            logger.debug(f"MoonCalc.today: user={user}, date={formatted_date}, phase={phase}")
+            fact = InterestingFact.objects.get(date_to_mailing=today_moscow)
+            if fact is None:
+                text = Messages.INT_FACTS_FACT_TODAY_NOT_FOUND
+            else:
+                text = Messages.INT_FACTS_FACT.format(id=fact.id)
+            logger.debug(f"IntFacts.today: user={user}")
 
             return SendMessages.update_or_replace_last_message(
                 user,
-                forced_delete,
                 text=text,
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
                 parse_mode="Markdown"

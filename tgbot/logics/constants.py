@@ -89,6 +89,8 @@ class Messages:
     MOON_CALC_ENTER_DATE_INCORRECT = "Неверный формат даты. Введите дату в формате дд.мм.гггг, например: 05.06.2025"
 
     INT_FACTS = "Интересные факты"
+    INT_FACTS_FACT = "Интересный факт {id}"
+    INT_FACTS_FACT_TODAY_NOT_FOUND = "К сожалению, на сегодня интересный факт отсутствует"
 
     ARTICLES_SECTION = "Выберите раздел"
     ARTICLES_SUBSECTION = "Выберите подраздел"
