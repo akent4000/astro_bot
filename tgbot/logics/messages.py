@@ -502,13 +502,16 @@ class SendMessages:
             text = Messages.QUIZZES_QUIZ_END.format(n=quiz_session.score(), n_questions=len(quiz_session.quiz.questions or []))
 
             for question in quiz_session.quiz.qestions or []:
-                text += question.text
-                text += question
+                text += Messages.QUIZZES_QUIZ_QUESTION_EXPLANATION.format(
+                    question=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
+                    choice=question.choices.filter(is_correct=True).first().text,
+                    explanation=question.explanation,
+                )
 
             SendMessages.update_or_replace_last_message(
                 user,
                 False,
-                text=,
+                text=text,
                 reply_markup=Keyboards.Quizzes.end(quiz_session),
                 parse_mode="Markdown"
             )

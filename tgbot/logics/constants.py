@@ -110,6 +110,8 @@ class Messages:
     QUIZZES_QUIZ = "Выберите квиз"
     QUIZZES_QUIZ_QUESTION = "❓ Вопрос №{n}\n{description}"
     QUIZZES_QUIZ_END = "Вы правильно ответили на {n} из {n_questions}\n"
+    QUIZZES_QUIZ_QUESTION_EXPLANATION = "\n{question}\nПравильный ответ: {choice}\nПояснение: {explanation}\n"
+
 
     USER_BLOCKED = "❌ Вы заблокированы и не можете пользоваться ботом."
     USER_NOT_FOUND_ERROR = "❌ Ошибка: пользователь не найден."

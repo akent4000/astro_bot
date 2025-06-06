@@ -373,7 +373,6 @@ class Choice(models.Model):
     is_correct = models.BooleanField(
         default=False,
         verbose_name='Правильный ответ',
-        help_text='Установите True для всех корректных вариантов'
     )
     order = models.PositiveIntegerField(
         verbose_name='Порядок варианта',
