@@ -413,15 +413,6 @@ class ApodApiKeyAdmin(SingletonModelAdmin):
     )
 
 ##############################
-# APOD API Key Admin (Singleton)
-##############################
-@admin.register(ApodApiKey)
-class ApodApiKeyAdmin(SingletonModelAdmin):
-    fieldsets = (
-        (None, {'fields': ('api_key',)}),
-    )
-
-##############################
 # Glossary Admin (Singleton)
 ##############################
 @admin.register(Glossary)
