@@ -172,9 +172,14 @@ class InterestingFacts(models.Model):
         verbose_name = 'Отправленное сообщение'
         verbose_name_plural = 'Отправленные сообщения'
 
+    def __str__(self):
+        return self.title or self.description[:50] or "Без названия"
 
 class ArticlesSection(models.Model):
     title = models.CharField(max_length=255, blank=True, null=True, verbose_name='Название раздела статей')
+
+    def __str__(self):
+        return self.title or "Раздел без названия"
 
     class Meta:
         verbose_name = 'Раздел статей'
@@ -192,6 +197,11 @@ class ArticlesSubsection(models.Model):
         verbose_name='Подраздел статей'
     )
 
+    def __str__(self):
+        if self.title:
+            return f"{self.section.title or 'Без раздела'} → {self.title}"
+        return "Подраздел без названия"
+
     class Meta:
         verbose_name = 'Подраздел статей'
         verbose_name_plural = 'Подразделы статей'
@@ -208,6 +218,9 @@ class Article(models.Model):
         blank=True,
         verbose_name='Подраздел статей'
     )
+
+    def __str__(self):
+        return self.title or self.link[:50] or "Статья без названия"
 
     class Meta:
         verbose_name = 'Статья'
