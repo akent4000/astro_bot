@@ -135,17 +135,21 @@ def configuration_pre_save(sender, instance, **kwargs):
             instance._old_test_mode = None
 
 def _restart_service():
-    # выполняем systemctl restart bot
     try:
-        subprocess.run(
+        result = subprocess.run(
             ['sudo', 'systemctl', 'restart', 'bot'],
             check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
+            text=True
+        )
+        logger.info(f"'bot' service restarted successfully. stdout:\n{result.stdout.strip()}")
+    except subprocess.CalledProcessError as e:
+        logger.error(
+            f"Failed to restart service 'bot'. Return code: {e.returncode}. "
+            f"stdout:\n{e.stdout.strip()}\nstderr:\n{e.stderr.strip()}"
         )
     except Exception as e:
-        # здесь можно залогировать неудачу, если нужно
-        logger.error("Failed to restart service 'bot':", e)
+        logger.exception("Unexpected error while trying to restart 'bot' service:")
 
 @receiver(post_save, sender=Configuration)
 def configuration_post_save(sender, instance, created, **kwargs):
