@@ -1,11 +1,10 @@
 import re
 import requests
 
-
 def parse_telegraph_title(url: str) -> str | None:
     """
     Запрашивает страницу telegra.ph и извлекает текст внутри тега <title>.
-    Убирает суффикс « | Telegra.ph » или аналогичный.
+    Убирает суффиксы « | Telegra.ph », « – Telegra.ph » или « - Telegraph » и всё, что после.
     Возвращает None, если что-то пошло не так.
     """
     try:
@@ -16,8 +15,12 @@ def parse_telegraph_title(url: str) -> str | None:
         if not match:
             return None
         raw_title = match.group(1).strip()
-        # Убираем « | Telegra.ph » или « – Telegra.ph » и всё, что после
-        cleaned = re.sub(r"\s*[|–-]\s*Telegra\.ph.*$", "", raw_title).strip()
+        # Убираем суффиксы «| Telegra.ph», «– Telegra.ph» или «- Telegraph»
+        cleaned = re.sub(
+            r"\s*[|–-]\s*(?:Telegra\.ph|Telegraph).*?$",
+            "",
+            raw_title
+        ).strip()
         return cleaned or None
     except Exception:
         return None
