@@ -399,7 +399,7 @@ class SendMessages:
 
             return SendMessages.update_or_replace_last_message(
                 user,
-                False,
+                True,
                 text=text,
                 reply_markup=Keyboards.IntFacts.back_and_main_menu(),
                 parse_mode="Markdown"
