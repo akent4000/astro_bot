@@ -179,8 +179,8 @@ class InterestingFact(models.Model):
 
 
     class Meta:
-        verbose_name = 'Отправленное сообщение'
-        verbose_name_plural = 'Отправленные сообщения'
+        verbose_name = 'Интересный факт'
+        verbose_name_plural = 'Интересные факты'
 
     def __str__(self):
         from tgbot.logics.telegraph_helper import parse_telegraph_title
