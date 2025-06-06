@@ -4,7 +4,8 @@ import time
 import re
 from typing import Optional, Iterable, Union
 
-from tgbot.dispatcher import bot
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 
 from tgbot.logics.apod_api import APODClient, APODClientError
 from tgbot.logics.keyboards import *
@@ -27,7 +28,6 @@ log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
 from telebot.apihelper import ApiException
-from tgbot.dispatcher import bot
 from tgbot.models import SentMessage, TelegramUser
 
 

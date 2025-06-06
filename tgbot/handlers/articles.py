@@ -6,7 +6,8 @@ from tgbot.handlers.utils import getCallbackNameFromCall
 from tgbot.logics.apod_api import APODClient, APODClientError
 from tgbot.models import ApodFile, ApodApiKey, ArticlesSection, ArticlesSubsection
 from tgbot.logics.constants import CallbackData, Messages
-from tgbot.dispatcher import bot 
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
 
 from tgbot.logics.messages import SendMessages

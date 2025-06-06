@@ -1,5 +1,6 @@
 from telebot.types import Message
-from tgbot.dispatcher import bot
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 from tgbot.logics.messages import SendMessages
 from tgbot.logics.constants import Commands
 from tgbot.logics.keyboards import Keyboards

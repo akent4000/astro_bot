@@ -5,7 +5,8 @@ from telebot.types import CallbackQuery
 from tgbot.logics.apod_api import APODClient, APODClientError
 from tgbot.models import ApodFile, ApodApiKey
 from tgbot.logics.constants import CallbackData
-from tgbot.dispatcher import bot 
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 from tgbot.logics.user_helper import get_user_from_call
 from tgbot.logics.messages import SendMessages
 

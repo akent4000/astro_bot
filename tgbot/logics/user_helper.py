@@ -2,7 +2,8 @@ import re
 import urllib.parse
 from telebot.types import CallbackQuery, MessageEntity
 
-from tgbot.dispatcher import bot
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 from tgbot.models import *
 from tgbot.logics.constants import *
 from tgbot.logics.messages import *

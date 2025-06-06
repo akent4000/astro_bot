@@ -25,7 +25,8 @@ def sync_user_data(update: Message | CallbackQuery | TelegramUser) -> tuple[Tele
             return None
         chat = update.message.chat
     elif isinstance(update, TelegramUser):
-        from tgbot.dispatcher import bot
+        from tgbot.dispatcher import get_main_bot
+        bot = get_main_bot()
         chat = bot.get_chat(update.chat_id)
     else:
         logger.error(f"sync_user_data: Unsupported update type {type(update)}")

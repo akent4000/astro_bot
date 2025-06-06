@@ -1,6 +1,7 @@
 from tgbot.models import TelegramUser
 import telebot
-from tgbot.dispatcher import bot
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 import time
 from tgbot.logics.constants import *
 from pathlib import Path

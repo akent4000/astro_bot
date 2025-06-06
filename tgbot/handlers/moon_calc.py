@@ -1,6 +1,7 @@
 import datetime
 from telebot.types import CallbackQuery
-from tgbot.dispatcher import bot
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 from tgbot.logics.constants import CallbackData, Messages
 from tgbot.logics.user_helper import get_user_from_call, extract_query_params, extract_int_param
 from tgbot.logics.messages import SendMessages

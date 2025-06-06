@@ -1,5 +1,6 @@
 from tgbot.models import TelegramUser
-from tgbot.dispatcher import bot
+from tgbot.dispatcher import get_main_bot
+bot = get_main_bot()
 
 from pathlib import Path
 from loguru import logger
