@@ -185,6 +185,34 @@ class InterestingFact(models.Model):
     def __str__(self):
         from tgbot.logics.telegraph_helper import parse_telegraph_title
         return parse_telegraph_title(self.link) or "Без названия"
+    
+class DailySubscription(models.Model):
+    """
+    Модель для хранения ежедневной подписки:
+    связывает TelegramUser с выбранным временем рассылки.
+    """
+    user = models.OneToOneField(
+        TelegramUser,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="daily_subscription"
+    )
+    send_time = models.TimeField(
+        verbose_name="Время ежедневной рассылки",
+        help_text="Укажите время в формате ЧЧ:ММ (например, 08:30)"
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Дата создания подписки"
+    )
+
+    class Meta:
+        verbose_name = "Ежедневная подписка"
+        verbose_name_plural = "Ежедневные подписки"
+        ordering = ["send_time"]
+
+    def __str__(self):
+        return f"Подписка {self.user} на {self.send_time.strftime('%H:%M')}"
 
 class ArticlesSection(models.Model):
     title = models.CharField(max_length=64, blank=True, null=True, verbose_name='Название раздела статей')
@@ -419,30 +447,3 @@ class ApodFile(models.Model):
     def __str__(self):
         return f"APOD {self.date} — {self.title or 'Без названия'}"
     
-class DailySubscription(models.Model):
-    """
-    Модель для хранения ежедневной подписки:
-    связывает TelegramUser с выбранным временем рассылки.
-    """
-    user = models.OneToOneField(
-        TelegramUser,
-        on_delete=models.CASCADE,
-        verbose_name="Пользователь",
-        related_name="daily_subscription"
-    )
-    send_time = models.TimeField(
-        verbose_name="Время ежедневной рассылки",
-        help_text="Укажите время в формате ЧЧ:ММ (например, 08:30)"
-    )
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name="Дата создания подписки"
-    )
-
-    class Meta:
-        verbose_name = "Ежедневная подписка"
-        verbose_name_plural = "Ежедневные подписки"
-        ordering = ["send_time"]
-
-    def __str__(self):
-        return f"Подписка {self.user} на {self.send_time.strftime('%H:%M')}"

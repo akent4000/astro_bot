@@ -8,21 +8,6 @@ from tgbot.logics.user_helper import get_user_from_call, extract_query_params, e
 def getCallbackNameFromCall(call: CallbackQuery):
     return call.data.split("?", 1)[0]
 
-# Обработчик для INT_FACTS_DEFAULT_TIME
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_DEFAULT_TIME)
-def handle_int_facts_default_time(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-    # Логика для установки времени по умолчанию
-
-# Обработчик для INT_FACTS_ENTER_TIME
-@bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.INT_FACTS_ENTER_TIME)
-def handle_int_facts_enter_time(call: CallbackQuery):
-    user = get_user_from_call(call)
-    if not user:
-        return
-    # Логика для запроса времени у пользователя
 
 # Обработчик для QUIZZES (главное меню квизов)
 @bot.callback_query_handler(func=lambda call: getCallbackNameFromCall(call) == CallbackData.QUIZZES)

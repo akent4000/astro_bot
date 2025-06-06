@@ -91,6 +91,11 @@ class Messages:
     INT_FACTS = "Интересные факты"
     INT_FACTS_FACT = "Интересный факт {id}"
     INT_FACTS_FACT_TODAY_NOT_FOUND = "К сожалению, на сегодня интересный факт отсутствует"
+    INT_FACTS_CHOOSE_ENTER_OR_DEFAULT = "Выберите время ежедневной рассылки"
+    INT_FACTS_FACT_ENTER_TIME = "Введите время в формате чч:мм\nВремя будет считаться по UTC+3 (Москва)"
+    INT_FACTS_FACT_ENTER_TIME_INCORRECT = "Неверный формат времени. Введите дату в формате чч:мм, например: 10:30\nВремя будет считаться по UTC+3 (Москва)"
+    INT_FACTS_SUB = "Вы успешно подписаны на ежедневную рассылку в {time} по Москве"
+    INT_FACTS_UNSUB = "Вы отписались от ежедневной рассылки интересных фактов"
 
     ARTICLES_SECTION = "Выберите раздел"
     ARTICLES_SUBSECTION = "Выберите подраздел"

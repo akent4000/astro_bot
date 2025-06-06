@@ -188,7 +188,7 @@ class SendMessages:
             logger.debug(f"MoonCalc.menu: user={user}")
             SendMessages.update_or_replace_last_message(
                 user,
-                False,
+                True,
                 text=Messages.MOON_CALC,
                 reply_markup=Keyboards.MoonCalc.menu(),
                 parse_mode="Markdown"
@@ -357,40 +357,62 @@ class SendMessages:
                 reply_markup=Keyboards.IntFacts.today(fact),
                 parse_mode="Markdown"
             )
-
+        
         @staticmethod
-        def enter_date(user: TelegramUser):
-            logger.debug(f"MoonCalc.enter_date: user={user}")
+        def choose_time_or_default(user: TelegramUser):
+            logger.debug(f"IntFacts.enter_time: user={user}")
             return SendMessages.update_or_replace_last_message(
                 user,
                 True,
-                text=Messages.MOON_CALC_ENTER_DATE,
-                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                text=Messages.INT_FACTS_CHOOSE_ENTER_OR_DEFAULT,
+                reply_markup=Keyboards.IntFacts.choose_time_or_default(),
                 parse_mode="Markdown"
             )
 
         @staticmethod
-        def incorrect_enter_date(user: TelegramUser):
-            logger.debug(f"MoonCalc.incorrect_enter_date: user={user}")
+        def enter_time(user: TelegramUser):
+            logger.debug(f"IntFacts.enter_time: user={user}")
             return SendMessages.update_or_replace_last_message(
                 user,
                 True,
-                text=Messages.MOON_CALC_ENTER_DATE_INCORRECT,
-                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                text=Messages.INT_FACTS_FACT_ENTER_TIME,
+                reply_markup=Keyboards.IntFacts.back_and_main_menu(),
                 parse_mode="Markdown"
             )
 
         @staticmethod
-        def date(user: TelegramUser, date: datetime.datetime):
-            formatted_date = date.date().strftime("%d.%m.%Y")
-            phase = moon_phase(date)
-            text = Messages.MOON_CALC_MSG.format(date=formatted_date, moon_phase=phase)
-            logger.debug(f"MoonCalc.date: user={user}, date={formatted_date}, phase={phase}")
-
+        def incorrect_enter_time(user: TelegramUser):
+            logger.debug(f"IntFacts.incorrect_enter_time: user={user}")
             return SendMessages.update_or_replace_last_message(
                 user,
                 True,
+                text=Messages.INT_FACTS_FACT_ENTER_TIME_INCORRECT,
+                reply_markup=Keyboards.IntFacts.back_enter_time_and_main_menu(),
+                parse_mode="Markdown"
+            )
+
+        @staticmethod
+        def sub(user: TelegramUser, time: datetime.datetime):
+            formatted_time = time.time().strftime("%H:%M")
+            text = Messages.INT_FACTS_SUB.format(time=formatted_time)
+            logger.debug(f"IntFacts.sub: user={user}, time={formatted_time}")
+
+            return SendMessages.update_or_replace_last_message(
+                user,
+                False,
                 text=text,
+                reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
+                parse_mode="Markdown"
+            )
+        
+        @staticmethod
+        def unsub(user: TelegramUser):
+            logger.debug(f"IntFacts.unsub: user={user}")
+
+            return SendMessages.update_or_replace_last_message(
+                user,
+                False,
+                text=Messages.INT_FACTS_UNSUB,
                 reply_markup=Keyboards.MoonCalc.back_and_main_menu(),
                 parse_mode="Markdown"
             )

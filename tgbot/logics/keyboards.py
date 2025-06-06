@@ -154,7 +154,7 @@ class Keyboards:
             return Keyboards._add_menu(Keyboards._add_back(markup, CallbackData.INT_FACTS))
         
         @staticmethod
-        def choose_time():
+        def choose_time_or_default():
             markup = InlineKeyboardMarkup()
 
             default_time = InlineKeyboardButton(
