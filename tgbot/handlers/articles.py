@@ -38,7 +38,7 @@ def handle_articles_section(call: CallbackQuery):
         bot.answer_callback_query(call.id, Messages.NOT_FOUND_ERROR.format(item="Раздел"))
         return
 
-    SendMessages.Articles.choose_article(user, section)
+    SendMessages.Articles.choose_subsection(user, section)
 
 
 # Обработчик для ARTICLES_SUBSECTION (с параметром subsection_id)
