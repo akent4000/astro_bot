@@ -11,6 +11,7 @@ from tgbot import dispatcher
 from tgbot.models import Configuration
 from tgbot.logics.info_for_admins import send_messege_to_admins
 from loguru import logger
+from tgbot.scheduler import run_scheduler
 
 # Убедимся, что папка для логов существует
 Path("logs").mkdir(parents=True, exist_ok=True)
@@ -19,7 +20,7 @@ logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
 _main_thread = None
 _test_thread = None
-
+_scheduler_thread = None
 
 def _run_main_bot():
     """Постоянный цикл polling для «главного» бота."""
@@ -115,9 +116,10 @@ def start_bots():
     logger.info("Запуск потоков ботов")
     _main_thread = threading.Thread(target=_run_main_bot, daemon=True)
     _test_thread = threading.Thread(target=_run_test_bot, daemon=True)
+    _scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
     _main_thread.start()
     _test_thread.start()
-
+    _scheduler_thread.start()
 
 class Command(BaseCommand):
     help = "Запускает два Telegram-бота (основной и тестовый) в режиме polling."
@@ -131,3 +133,5 @@ class Command(BaseCommand):
             _main_thread.join()
         if _test_thread:
             _test_thread.join()
+        if _scheduler_thread:
+            _scheduler_thread.join()
