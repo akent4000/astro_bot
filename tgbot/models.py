@@ -194,7 +194,7 @@ class ArticlesSubsection(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name='Подраздел статей'
+        verbose_name='Раздел статьи'
     )
 
     def __str__(self):
@@ -216,7 +216,7 @@ class Article(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        verbose_name='Подраздел статей'
+        verbose_name='Подраздел статьи'
     )
 
     def __str__(self):
