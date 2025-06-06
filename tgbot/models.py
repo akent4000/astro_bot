@@ -38,20 +38,6 @@ class Configuration(SingletonModel):
     def __str__(self):
         return "Конфигурация бота"
 
-class ApodApiKey(SingletonModel):
-    api_key = models.TextField(
-        blank=True,
-        null=True,
-        verbose_name='API ключ для доступа к NASA APOD API',
-    )
-
-    class Meta:
-        verbose_name = 'APOD API ключ'
-        verbose_name_plural = 'APOD API ключ'
-
-    def __str__(self):
-        return self.api_key or ""
-
 class TelegramBotToken(models.Model):
     """Модель для хранения токена бота"""
     token = models.CharField(max_length=255, verbose_name='Токен бота')
@@ -336,7 +322,8 @@ class Choice(models.Model):
         return self.text
 
 class Glossary(SingletonModel):
-    link = models.TextField(
+    link = models.CharField(
+        max_length=255,
         blank=True,
         null=True,
         verbose_name='Ссылка на глоссарий',
@@ -348,7 +335,22 @@ class Glossary(SingletonModel):
 
     def __str__(self):
         return self.link or ""
-    
+
+class ApodApiKey(SingletonModel):
+    api_key = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name='API ключ для доступа к NASA APOD API',
+    )
+
+    class Meta:
+        verbose_name = 'APOD API ключ'
+        verbose_name_plural = 'APOD API ключ'
+
+    def __str__(self):
+        return self.api_key or ""
+
 class ApodFile(models.Model):
     """
     Модель для хранения метаданных APOD (Astronomy Picture of the Day) и telegram_media_id,
