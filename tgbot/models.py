@@ -325,6 +325,10 @@ class Quiz(models.Model):
         verbose_name='Категория квиза'
     )
 
+    @property
+    def question_count(self) -> int:
+        return self.questions.count()
+
     class Meta:
         verbose_name = 'Квиз'
         verbose_name_plural = 'Квизы'
@@ -366,6 +370,7 @@ class Question(models.Model):
             quiz=self.quiz,
             order__gt=self.order
         ).order_by('order').first()
+    
 
 
 class Choice(models.Model):

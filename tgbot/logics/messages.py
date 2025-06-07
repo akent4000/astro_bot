@@ -499,7 +499,7 @@ class SendMessages:
         @staticmethod
         def end(user: TelegramUser, session: UserQuizSession):
             logger.debug(f"Quizzes.end: user={user}")
-            text = Messages.QUIZZES_QUIZ_END.format(n=session.score(), n_questions=len(session.quiz.questions or []))
+            text = Messages.QUIZZES_QUIZ_END.format(n=session.score(), n_questions=session.quiz.question_count)
 
             for question in session.quiz.qestions or []:
                 text += Messages.QUIZZES_QUIZ_QUESTION_EXPLANATION.format(
