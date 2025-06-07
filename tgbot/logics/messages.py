@@ -504,6 +504,7 @@ class SendMessages:
             for question in session.quiz.questions.all():
                 text += Messages.QUIZZES_QUIZ_QUESTION_EXPLANATION.format(
                     question=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
+                    user_choice=session.answers.filter(question=question).first().text,
                     choice=question.choices.filter(is_correct=True).first().text,
                     explanation=question.explanation,
                 )
