@@ -27,6 +27,6 @@ from tgbot.models import *
 from tgbot.forms import SSHKeyAdminForm, SSHKeyChangeForm, SendMessageForm
 
 # Заголовки админки
-admin.site.site_header = "Администрирование Astro Bot"
-admin.site.site_title = "Администрирование Astro Bot"
-admin.site.index_title = "Администрирование Astro Bot"
+admin.site.site_header = "AstroBot"
+admin.site.site_title = "AstroBot"
+admin.site.index_title = "AstroBot"
