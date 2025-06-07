@@ -299,7 +299,7 @@ class Keyboards:
             {
                 CallbackData.QUIZZES_QUIZ_SESSION_DELETE_ID: session.id, 
             })
-            menu_btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=menu_cb)
+            menu_btn = InlineKeyboardButton(text=ButtonNames.MENU, callback_data=menu_cb)
             markup.add(menu_btn)
             return markup
     
@@ -319,7 +319,7 @@ class Keyboards:
                         })
                     btn = InlineKeyboardButton(text=choice.text, callback_data=callback)
                     markup.add(btn)
-                    
+
             return Keyboards.Quizzes._add_menu_delete_session(
                 Keyboards.Quizzes._add_back_to_choose_quiz_delete_session(
                     markup,question.quiz.level,
