@@ -34,45 +34,39 @@ class QuizLevelAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
-
 class ChoiceInline(nested_admin.NestedTabularInline):
     model = Choice
-    extra = 1
+    extra = 0            # не показывать сразу пустые
+    min_num = 1          # минимум один вариант
     sortable_field_name = 'order'
-    fields = ('text', 'is_correct', 'order',)
+    fields = ('text', 'is_correct', 'order')
     formfield_overrides = {
-        # делаем поле текста компактнее
-        models.CharField: {'widget': TextInput(attrs={'size': '40'})},
+        models.CharField: {
+            'widget': TextInput(attrs={'size': 30})
+        },
     }
 
 class QuestionInline(nested_admin.NestedTabularInline):
-    css = {'all': ('admin/css/quiz_compact.css',)}
+    class Media:
+        css = {'all': ('admin/css/compact_quiz.css',)}
     model = Question
-    inlines = [ChoiceInline]           # вложаем табличный инлайн
-    extra = 1
+    inlines = [ChoiceInline]
+    extra = 0
     sortable_field_name = 'order'
-    # показываем в одной строке: текст вопроса и порядок,
-    # а пояснение складываем в сворачиваемый блок
-    fieldsets = (
-        (None, {
-            'fields': ('text', 'order'),
-        }),
-        ('Пояснение к вопросу', {
-            'fields': ('explanation',),
-            'classes': ('collapse',),   # свернут по умолчанию
-        }),
-    )
+    # оставить в таблице только самое важное
+    fields = ('text', 'order')
     formfield_overrides = {
-        # делаем текст вопроса компактнее
-        models.TextField: {'widget': TextInput(attrs={'size': '80'})},
+        models.TextField: {
+            'widget': TextInput(attrs={'size': 50})
+        },
     }
-    show_change_link = True  # если в табличном ряду кликнуть — откроется полный редактирование вопроса
+    show_change_link = True   # кликом по тексту переходим в детальную форму (где уже можно править explanation)
 
 @admin.register(Quiz)
 class QuizAdmin(nested_admin.NestedModelAdmin):
     list_display = ('title', 'topic', 'level', 'question_count')
     inlines = [QuestionInline]
-    save_on_top = True           # кнопки сохранить/отменить также сверху
+    save_on_top = True
     ordering = ('-id',)
 
 

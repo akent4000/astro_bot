@@ -1,4 +1,5 @@
 .inline-related .field-text input,
-.inline-related .field-explanation input {
-  max-width: 300px;
+.inline-related .field-order input {
+  max-width: 200px;
+  font-size: 0.9em;
 }
