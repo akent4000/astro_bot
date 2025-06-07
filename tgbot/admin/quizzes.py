@@ -60,7 +60,7 @@ class QuestionInline(
     show_change_link = True    # кликом по строке перейдём в детальную форму
 
     # прячем инлайн вариантов и показываем только по клику
-    classes = ('collapse',)
+    classes = ('collapse', 'open')
     verbose_name = "Вопрос"
     verbose_name_plural = "Вопросы"
 
