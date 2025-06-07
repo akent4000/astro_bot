@@ -491,7 +491,7 @@ class SendMessages:
             SendMessages.update_or_replace_last_message(
                 user,
                 False,
-                text=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
+                text=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order+1, description=question.text),
                 reply_markup=Keyboards.Quizzes.question(question, session),
                 parse_mode="Markdown"
             )
