@@ -272,9 +272,8 @@ class Keyboards:
                 markup.add(btn)
 
             back_cb = Keyboards.build_callback_data(
-                CallbackData.QUIZZES_LEVEL,
+                CallbackData.QUIZZES_TOPIC,
                 {
-                    CallbackData.QUIZZES_LEVEL_ID: quiz_level.id,
                     CallbackData.QUIZZES_TOPIC_ID: quiz_topic.id
                 }
             )
