@@ -59,6 +59,9 @@ INSTALLED_APPS = [
     'tgbot',
     'rangefilter',
     'solo',
+    'nested_admin',
+    'django.contrib.admin',
+    'jazzmin',
 ]
 
 MIDDLEWARE = [
@@ -147,3 +150,70 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Администрирование Astro Bot",
+    "site_header": "Astro Bot Admin",
+    "site_brand": "AstroBot",
+    # и другие ваши опции…
+
+    "navigation": [
+        # Блок «APOD»
+        {
+            "app": "tgbot",
+            "models": ["tgbot.apodapikey", "tgbot.apodfile"],
+            "label": "🚀 APOD",
+        },
+        # Блок «Статьи»
+        {
+            "app": "tgbot",
+            "models": [
+                "tgbot.articlessection",
+                "tgbot.articlessubsection",
+                "tgbot.article"
+            ],
+            "label": "📰 Статьи",
+        },
+        # Блок «Конфигурация бота»
+        {
+            "app": "tgbot",
+            "models": ["tgbot.telegrambottoken", "tgbot.configuration"],
+            "label": "⚙️ Настройки бота",
+        },
+        # Блок «Глоссарий»
+        {
+            "app": "tgbot",
+            "models": ["tgbot.glossary"],
+            "label": "📖 Глоссарий",
+        },
+        # Блок «Интересные факты»
+        {
+            "app": "tgbot",
+            "models": ["tgbot.interestingfact", "tgbot.dailysubscription"],
+            "label": "💡 Интересные факты",
+        },
+        # Блок «SSH-ключи и Сервер»
+        {
+            "app": "tgbot",
+            "models": ["tgbot.sshkey", "tgbot.server"],
+            "label": "🔑 SSH и Сервер",
+        },
+        # Блок «Пользователи Telegram»
+        {
+            "app": "tgbot",
+            "models": ["tgbot.telegramuser", "tgbot.sentmessage"],
+            "label": "👤 Пользователи",
+        },
+        # Блок «Квизы»
+        {
+            "app": "tgbot",
+            "models": [
+                "tgbot.quiztopic", "tgbot.quizlevel", "tgbot.quiz",
+                "tgbot.question", "tgbot.choice",
+                "tgbot.userquizsession", "tgbot.userquizanswer",
+            ],
+            "label": "📚 Квизы",
+        },
+        # … можно дальше по остальным моделям
+    ]
+}
