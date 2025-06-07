@@ -49,6 +49,8 @@ STATIC_ROOT = '/www/static/'
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
+    'nested_admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -59,8 +61,6 @@ INSTALLED_APPS = [
     'tgbot',
     'rangefilter',
     'solo',
-    'nested_admin',
-    'jazzmin',
 ]
 
 MIDDLEWARE = [
