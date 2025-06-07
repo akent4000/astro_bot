@@ -153,8 +153,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 JAZZMIN_SETTINGS = {
-    "site_title": "Администрирование Astro Bot",
-    "site_header": "Astro Bot Admin",
+    "site_title": "AstroBot",
+    "site_header": "AstroBot",
     "site_brand": "AstroBot",
 }
 
