@@ -358,6 +358,7 @@ class Question(models.Model):
     )
 
     class Meta:
+        unique_together = ('quiz', 'order')
         verbose_name = 'Вопрос'
         verbose_name_plural = 'Вопросы'
         ordering = ['id']
@@ -392,6 +393,7 @@ class Choice(models.Model):
     )
 
     class Meta:
+        unique_together = ('question', 'order')
         verbose_name = 'Вариант ответа'
         verbose_name_plural = 'Варианты ответов'
 
