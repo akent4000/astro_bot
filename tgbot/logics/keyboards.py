@@ -312,7 +312,7 @@ class Keyboards:
             back_cb = Keyboards.build_callback_data(
                 CallbackData.QUIZZES_LEVEL, 
                 { 
-                    CallbackData.QUIZZES_QUIZ_ID: session.quiz.level.id,
+                    CallbackData.QUIZZES_LEVEL_ID: session.quiz.level.id,
                     CallbackData.QUIZZES_TOPIC_ID: session.quiz.topic.id
                 })
             btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=back_cb)
