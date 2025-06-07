@@ -54,7 +54,7 @@ class QuestionInline(nested_admin.NestedTabularInline):
     extra = 0
     sortable_field_name = 'order'
     # оставить в таблице только самое важное
-    fields = ('text', 'order')
+    fields = ('text', 'explanation', 'order')
     formfield_overrides = {
         models.TextField: {
             'widget': TextInput(attrs={'size': 50})
