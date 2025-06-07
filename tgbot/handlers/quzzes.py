@@ -79,7 +79,7 @@ def handle_quizzes_quiz(call: CallbackQuery):
     if not question:
         return
     
-    session = UserQuizSession.objects.get_or_create(user=user, quiz=quiz)
+    session = UserQuizSession.objects.create(user=user, quiz=quiz)
     SendMessages.Quizzes.question(user, question, session)
 
 @bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE)
