@@ -158,6 +158,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "Администрирование Astro Bot",
     "site_header": "Astro Bot Admin",
     "site_brand": "AstroBot",
+    "show_sidebar": False,
 }
 
 ADMIN_TOOLS_MENU = 'AstroBot.admin_tools.CustomMenu'
