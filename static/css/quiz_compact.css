@@ -1,0 +1,4 @@
+.inline-related .field-text input,
+.inline-related .field-explanation input {
+  max-width: 300px;
+}

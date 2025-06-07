@@ -46,6 +46,7 @@ class ChoiceInline(nested_admin.NestedTabularInline):
     }
 
 class QuestionInline(nested_admin.NestedTabularInline):
+    css = {'all': ('admin/css/quiz_compact.css',)}
     model = Question
     inlines = [ChoiceInline]           # вложаем табличный инлайн
     extra = 1
