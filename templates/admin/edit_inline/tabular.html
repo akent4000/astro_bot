@@ -1,0 +1,23 @@
+{% extends "admin/edit_inline/tabular.html" %}
+{% load i18n %}
+
+{% block table_header %}
+  <tr>
+    {# пустая шапка под колонку «Изменить» #}
+    {% if inline_admin_formset.opts.show_change_link %}
+      <th class="column-changelink"></th>
+    {% endif %}
+    {# стандартные заголовки ваших полей #}
+    {% for field_name, field in inline_admin_formset.fields %}
+      <th{% if field_name %} class="field-{{ field_name }}"{% endif %}>
+        {{ field.label|capfirst }}
+      </th>
+    {% endfor %}
+    {# заголовок «Удалить?» под «can_delete» #}
+    {% if inline_admin_formset.can_delete %}
+      <th class="column-delete">
+        {{ inline_admin_formset.formset.delete_label }}
+      </th>
+    {% endif %}
+  </tr>
+{% endblock %}

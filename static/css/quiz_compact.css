@@ -1,5 +1,35 @@
-.inline-related .field-text input,
-.inline-related .field-order input {
-  max-width: 200px;
+/* 1) гарантируем фиксированный layout всей таблицы */
+.inline-related table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* 2) ширины под каждую колонку: */
+.inline-related th.column-changelink,
+.inline-related td.field-__str__ {
+  /* колонка «Изменить» */
+  width: 3em;
+}
+
+.inline-related th.field-text,
+.inline-related td.field-text {
+  /* основное поле текста */
+  width: 60%;
+}
+
+.inline-related th.field-order,
+.inline-related td.field-order {
+  /* порядок */
+  width: 10%;
+}
+
+.inline-related th.column-delete,
+.inline-related td.delete {
+  /* чекбокс «Удалить» */
+  width: 5%;
+}
+
+/* 3) при необходимости подкорректируйте padding/font-size */
+.inline-related input {
   font-size: 0.9em;
 }
