@@ -14,7 +14,8 @@ from tgbot.models import (
 )
 from django.utils.html import format_html
 from django.forms import TextInput, Textarea
-
+from inline_admin_paginator.admin import TabularInlinePaginated
+from .models import Quiz, Question, Choice
 
 ##############################
 # QuizTopic Admin
@@ -36,31 +37,36 @@ class QuizLevelAdmin(admin.ModelAdmin):
 
 class ChoiceInline(nested_admin.NestedTabularInline):
     model = Choice
-    extra = 0            # не показывать сразу пустые
-    min_num = 1          # минимум один вариант
+    extra = 0
+    min_num = 1
     sortable_field_name = 'order'
     fields = ('text', 'is_correct', 'order')
     formfield_overrides = {
-        models.CharField: {
-            'widget': TextInput(attrs={'size': 30})
-        },
+        models.CharField: {'widget': TextInput(attrs={'size': 30})},
     }
 
-class QuestionInline(nested_admin.NestedTabularInline):
-    class Media:
-        css = {'all': ('admin/css/compact_quiz.css',)}
+class QuestionInline(
+    nested_admin.NestedTabularInline,
+    TabularInlinePaginated
+):
     model = Question
     inlines = [ChoiceInline]
+    per_page = 5               # не больше 5 вопросов на «страницу»
     extra = 0
     sortable_field_name = 'order'
-    # оставить в таблице только самое важное
     fields = ('text', 'order')
     formfield_overrides = {
-        models.TextField: {
-            'widget': TextInput(attrs={'size': 50})
-        },
+        models.TextField: {'widget': TextInput(attrs={'size': 50})},
     }
-    show_change_link = True   # кликом по тексту переходим в детальную форму (где уже можно править explanation)
+    show_change_link = True    # кликом по строке перейдём в детальную форму
+
+    # прячем инлайн вариантов и показываем только по клику
+    classes = ('collapse',)
+    verbose_name = "Вопрос"
+    verbose_name_plural = "Вопросы"
+
+    class Media:
+        js = ('admin/js/quiz_inline_toggle.js',)
 
 @admin.register(Quiz)
 class QuizAdmin(nested_admin.NestedModelAdmin):
