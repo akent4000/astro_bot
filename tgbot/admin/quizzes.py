@@ -15,7 +15,6 @@ from tgbot.models import (
 from django.utils.html import format_html
 from django.forms import TextInput, Textarea
 from django_admin_inline_paginator.admin import TabularInlinePaginated
-from .models import Quiz, Question, Choice
 
 ##############################
 # QuizTopic Admin
