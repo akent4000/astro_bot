@@ -13,6 +13,7 @@ from tgbot.models import (
     UserQuizAnswer,
 )
 from django.utils.html import format_html
+from django.forms import TextInput, Textarea
 
 
 ##############################
