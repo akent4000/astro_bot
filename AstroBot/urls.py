@@ -18,6 +18,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('_nested_admin/', include('nested_admin.urls')),
+    path('quiz/', include('tgbot.urls')),
     path('admin/', admin.site.urls),
 ]
