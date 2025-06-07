@@ -82,7 +82,7 @@ def handle_quizzes_quiz(call: CallbackQuery):
     session = UserQuizSession.objects.create(user=user, quiz=quiz)
     SendMessages.Quizzes.question(user, question, session)
 
-@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZZ_QUESTION_CHOISE)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE)
 def handle_quizzes_question_choice(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
