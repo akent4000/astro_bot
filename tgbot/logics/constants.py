@@ -109,17 +109,17 @@ class Messages:
 
     QUIZZES_TOPIC = "📚 Выберите тему"
     QUIZZES_LEVEL = "🎓 Выберите уровень"
-    QUIZZES_QUIZ = "Выберите квиз"
+    QUIZZES_QUIZ = "📝 Выберите квиз"
     QUIZZES_QUIZ_QUESTION = "❓ Вопрос №{n}\n{description}"
-    QUIZZES_QUIZ_END = "Вы правильно ответили на {n} из {n_questions}\n"
-    QUIZZES_QUIZ_QUESTION_EXPLANATION = "\n{question}\nВаш ответ: {user_choice}\nПравильный ответ: {choice}\nПояснение: {explanation}\n"
-
+    QUIZZES_QUIZ_END = "🎉 Вы правильно ответили на {n} из {n_questions}\n"
+    QUIZZES_QUIZ_QUESTION_EXPLANATION = "ℹ️ {question}\nВаш ответ: {user_choice}\nПравильный ответ: {choice}\nПояснение: {explanation}\n"
 
     USER_BLOCKED = "❌ Вы заблокированы и не можете пользоваться ботом."
     USER_NOT_FOUND_ERROR = "❌ Ошибка: пользователь не найден."
     MISSING_PARAMETERS_ERROR = "❌ Ошибка: отсутствуют параметры."
-    INCORRECT_VALUE_ERROR = "❌ Ошибка: неверное значение для {key}."
+    INCORRECT_VALUE_ERROR = "⚠️ Ошибка: неверное значение для {key}."
     NOT_FOUND_ERROR = "❌ {item} не найден."
+
 
 class CommandsNames:
     START = "Старт бота и показ меню"
