@@ -50,6 +50,17 @@ def handle_quizzes_level(call: CallbackQuery):
     if topic_id is None:
         return
 
+    session_to_delete_id = extract_int_param(
+        call,
+        params,
+        CallbackData.QUIZZES_QUIZ_SESSION_DELETE_ID,
+    )
+
+    if session_to_delete_id is not None:
+        session_to_delete = UserQuizSession.objects.filter(id=session_to_delete_id).first()
+        if session_to_delete:
+            session_to_delete.delete()
+
     # Получаем объекты уровня и темы
     level = QuizLevel.objects.filter(id=level_id).first()
     topic = QuizTopic.objects.filter(id=topic_id).first()

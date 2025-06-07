@@ -47,6 +47,8 @@ class CallbackData:
     QUIZZES_QUIZ_ID = f"{QUIZZES_QUIZ}_{ID}"                                    # "qz_q_i"
     QUIZZES_QUIZ_SESSION = f"{QUIZZES_QUIZ}_s"                                  # "qz_q"
     QUIZZES_QUIZ_SESSION_ID = f"{QUIZZES_QUIZ_SESSION}_{ID}"                    # "qz_q_i"
+    QUIZZES_QUIZ_SESSION_DELETE = f"{QUIZZES_QUIZ_SESSION}_d"                   # "qz_q_i_d"
+    QUIZZES_QUIZ_SESSION_DELETE_ID = f"{QUIZZES_QUIZ_SESSION_DELETE}_{ID}"      # "qz_q_q_d_i"
     QUIZZES_QUIZ_QUESTION = f"{QUIZZES_QUIZ}_q"                                 # "qz_q_q"
     QUIZZES_QUIZ_QUESTION_ID = f"{QUIZZES_QUIZ_QUESTION}_{ID}"                  # "qz_q_q_i"
     QUIZZES_QUIZ_QUESTION_CHOISE = f"{QUIZZES_QUIZ_QUESTION}_c"                 # "qz_q_q_c"

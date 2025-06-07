@@ -280,6 +280,31 @@ class Keyboards:
             return Keyboards._add_menu(Keyboards._add_back(markup, back_cb))
 
         @staticmethod
+        def _add_back_to_choose_quiz_delete_session(markup: InlineKeyboardMarkup, quiz_topic: QuizTopic, quiz_level: QuizLevel, session: UserQuizSession) -> InlineKeyboardMarkup:
+            back_cb = Keyboards.build_callback_data(
+            CallbackData.QUIZZES_LEVEL, 
+            {
+                CallbackData.QUIZZES_LEVEL_ID: quiz_level.id,
+                CallbackData.QUIZZES_TOPIC_ID: quiz_topic.id,
+                CallbackData.QUIZZES_QUIZ_SESSION_DELETE_ID: session.id, 
+            })
+            btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=back_cb)
+            markup.add(btn)
+            return markup
+        
+        @staticmethod
+        def _add_menu_delete_session(markup: InlineKeyboardMarkup, session: UserQuizSession) -> InlineKeyboardMarkup:
+            menu_cb = Keyboards.build_callback_data(
+            CallbackData.MENU, 
+            {
+                CallbackData.QUIZZES_QUIZ_SESSION_DELETE_ID: session.id, 
+            })
+            menu_btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=menu_cb)
+            markup.add(menu_btn)
+            return markup
+    
+
+        @staticmethod
         def question(question: Question, session: UserQuizSession) -> InlineKeyboardMarkup:
             markup = InlineKeyboardMarkup()
 
@@ -294,16 +319,15 @@ class Keyboards:
                         })
                     btn = InlineKeyboardButton(text=choice.text, callback_data=callback)
                     markup.add(btn)
-
-            back_cb = Keyboards.build_callback_data(
-                CallbackData.QUIZZES_LEVEL, 
-                {
-                    CallbackData.QUIZZES_QUIZ_ID: question.quiz.level.id,
-                    CallbackData.QUIZZES_TOPIC_ID: question.quiz.topic.id,
-                })
-            btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=back_cb)
-            markup.add(btn)
-            return Keyboards._add_menu(markup)
+                    
+            return Keyboards.Quizzes._add_menu_delete_session(
+                Keyboards.Quizzes._add_back_to_choose_quiz_delete_session(
+                    markup,question.quiz.level,
+                    question.quiz.topic,
+                    session
+                ), 
+                session
+            )
         
         @staticmethod
         def end(session: UserQuizSession) -> InlineKeyboardMarkup:
