@@ -429,7 +429,6 @@ class UserQuizSession(models.Model):
     class Meta:
         verbose_name = 'Сессия квиза'
         verbose_name_plural = 'Сессии квизов'
-        unique_together = ('user', 'quiz')
 
     def __str__(self):
         return f"Сессия {self.quiz} для {self.user}"
@@ -484,6 +483,7 @@ class UserQuizAnswer(models.Model):
     class Meta:
         verbose_name = 'Ответ на вопрос'
         verbose_name_plural = 'Ответы на вопросы'
+        unique_together = ('session', 'question')
 
     def __str__(self):
         return f"Сессия {self.session.id} | Вопрос {self.question.id} → «{self.choice.text}»"

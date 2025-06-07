@@ -114,7 +114,7 @@ def handle_quizzes_question_choice(call: CallbackQuery):
     if not choice or not session:
         return
 
-    UserQuizAnswer.objects.create(session=session, question=choice.question, choice=choice)
+    UserQuizAnswer.objects.get_or_create(session=session, question=choice.question, choice=choice)
 
     next_question = choice.question.get_next()
     if next_question:
