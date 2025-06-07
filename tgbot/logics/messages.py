@@ -501,7 +501,7 @@ class SendMessages:
             logger.debug(f"Quizzes.end: user={user}")
             text = Messages.QUIZZES_QUIZ_END.format(n=session.score(), n_questions=session.quiz.question_count)
 
-            for question in session.quiz.qestions.all():
+            for question in session.quiz.questions.all():
                 text += Messages.QUIZZES_QUIZ_QUESTION_EXPLANATION.format(
                     question=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
                     choice=question.choices.filter(is_correct=True).first().text,
