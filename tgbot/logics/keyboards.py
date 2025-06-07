@@ -281,13 +281,18 @@ class Keyboards:
             return Keyboards._add_menu(Keyboards._add_back(markup, back_cb))
 
         @staticmethod
-        def question(question: Question) -> InlineKeyboardMarkup:
+        def question(question: Question, session: UserQuizSession) -> InlineKeyboardMarkup:
             markup = InlineKeyboardMarkup()
 
             choices = Choice.objects.filter(question=question).order_by("order")
             if choices.exists():
                 for choice in choices:
-                    callback = Keyboards.build_callback_data(CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE, {CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE_ID: choice.id})
+                    callback = Keyboards.build_callback_data(
+                        CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE, 
+                        {
+                            CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE_ID: choice.id,
+                            CallbackData.QUIZZES_QUIZ_SESSION_ID: session.id,
+                        })
                     btn = InlineKeyboardButton(text=choice.text, callback_data=callback)
                     markup.add(btn)
 
@@ -302,13 +307,13 @@ class Keyboards:
             return Keyboards._add_menu(markup)
         
         @staticmethod
-        def end(quiz_session: UserQuizSession) -> InlineKeyboardMarkup:
+        def end(session: UserQuizSession) -> InlineKeyboardMarkup:
             markup = InlineKeyboardMarkup()
             back_cb = Keyboards.build_callback_data(
                 CallbackData.QUIZZES_LEVEL, 
                 { 
-                    CallbackData.QUIZZES_QUIZ_ID: quiz_session.quiz.level.id,
-                    CallbackData.QUIZZES_TOPIC_ID: quiz_session.quiz.topic.id
+                    CallbackData.QUIZZES_QUIZ_ID: session.quiz.level.id,
+                    CallbackData.QUIZZES_TOPIC_ID: session.quiz.topic.id
                 })
             btn = InlineKeyboardButton(text=ButtonNames.QUIZZES_BACK_TO_CHOISE_QUIZ, callback_data=back_cb)
             markup.add(btn)

@@ -360,6 +360,12 @@ class Question(models.Model):
 
     def __str__(self):
         return f"{self.text[:50]}..." if len(self.text) > 50 else self.text
+    
+    def get_next(self):
+        return Question.objects.filter(
+            quiz=self.quiz,
+            order__gt=self.order
+        ).order_by('order').first()
 
 
 class Choice(models.Model):

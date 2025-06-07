@@ -486,22 +486,22 @@ class SendMessages:
             )
 
         @staticmethod
-        def question(user: TelegramUser, question: Question):
+        def question(user: TelegramUser, question: Question, session: UserQuizSession):
             logger.debug(f"Quizzes.question: user={user}")
             SendMessages.update_or_replace_last_message(
                 user,
                 False,
                 text=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
-                reply_markup=Keyboards.Quizzes.question(question),
+                reply_markup=Keyboards.Quizzes.question(question, session),
                 parse_mode="Markdown"
             )
         
         @staticmethod
-        def end(user: TelegramUser, quiz_session: UserQuizSession):
+        def end(user: TelegramUser, session: UserQuizSession):
             logger.debug(f"Quizzes.end: user={user}")
-            text = Messages.QUIZZES_QUIZ_END.format(n=quiz_session.score(), n_questions=len(quiz_session.quiz.questions or []))
+            text = Messages.QUIZZES_QUIZ_END.format(n=session.score(), n_questions=len(session.quiz.questions or []))
 
-            for question in quiz_session.quiz.qestions or []:
+            for question in session.quiz.qestions or []:
                 text += Messages.QUIZZES_QUIZ_QUESTION_EXPLANATION.format(
                     question=Messages.QUIZZES_QUIZ_QUESTION.format(n=question.order, description=question.text),
                     choice=question.choices.filter(is_correct=True).first().text,
@@ -512,6 +512,6 @@ class SendMessages:
                 user,
                 False,
                 text=text,
-                reply_markup=Keyboards.Quizzes.end(quiz_session),
+                reply_markup=Keyboards.Quizzes.end(session),
                 parse_mode="Markdown"
             )
