@@ -1,6 +1,7 @@
 # tgbot/admin/quiz.py
 import nested_admin
 from django.contrib import admin
+from django.db import models
 from django.utils import timezone
 from tgbot.models import (
     QuizTopic,
@@ -32,27 +33,45 @@ class QuizLevelAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
+
 class ChoiceInline(nested_admin.NestedTabularInline):
     model = Choice
     extra = 1
     sortable_field_name = 'order'
-    fields = ('text', 'is_correct', 'order')
+    fields = ('text', 'is_correct', 'order',)
+    formfield_overrides = {
+        # делаем поле текста компактнее
+        models.CharField: {'widget': TextInput(attrs={'size': '40'})},
+    }
 
-class QuestionInline(nested_admin.NestedStackedInline):
+class QuestionInline(nested_admin.NestedTabularInline):
     model = Question
+    inlines = [ChoiceInline]           # вложаем табличный инлайн
     extra = 1
-    inlines = [ChoiceInline]
     sortable_field_name = 'order'
-    fields = ('text', 'explanation', 'order')
-    # если хотите показывать сразу кол-во вариантов:
-    readonly_fields = ()
+    # показываем в одной строке: текст вопроса и порядок,
+    # а пояснение складываем в сворачиваемый блок
+    fieldsets = (
+        (None, {
+            'fields': ('text', 'order'),
+        }),
+        ('Пояснение к вопросу', {
+            'fields': ('explanation',),
+            'classes': ('collapse',),   # свернут по умолчанию
+        }),
+    )
+    formfield_overrides = {
+        # делаем текст вопроса компактнее
+        models.TextField: {'widget': TextInput(attrs={'size': '80'})},
+    }
+    show_change_link = True  # если в табличном ряду кликнуть — откроется полный редактирование вопроса
 
 @admin.register(Quiz)
 class QuizAdmin(nested_admin.NestedModelAdmin):
     list_display = ('title', 'topic', 'level', 'question_count')
-    list_filter = ('topic', 'level')
-    search_fields = ('title',)
     inlines = [QuestionInline]
+    save_on_top = True           # кнопки сохранить/отменить также сверху
+    ordering = ('-id',)
 
 
 ##############################
