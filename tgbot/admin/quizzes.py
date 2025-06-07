@@ -65,7 +65,7 @@ class QuestionInline(
     verbose_name_plural = "Вопросы"
 
     class Media:
-        js = ('admin/js/quiz_inline_toggle.js',)
+        js = ('static/js/quiz_inline_toggle.js',)
 
 @admin.register(Quiz)
 class QuizAdmin(nested_admin.NestedModelAdmin):
