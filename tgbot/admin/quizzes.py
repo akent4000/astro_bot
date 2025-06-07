@@ -1,5 +1,5 @@
 # tgbot/admin/quiz.py
-
+import nested_admin
 from django.contrib import admin
 from django.utils import timezone
 from tgbot.models import (
@@ -32,42 +32,27 @@ class QuizLevelAdmin(admin.ModelAdmin):
     search_fields = ("title",)
 
 
-##############################
-# Choice Inline for Question
-##############################
-class ChoiceInline(admin.TabularInline):
+class ChoiceInline(nested_admin.NestedTabularInline):
     model = Choice
-    fields = ("order", "text", "is_correct")
     extra = 1
-    ordering = ("order",)
-    show_change_link = True
+    sortable_field_name = 'order'
+    fields = ('text', 'is_correct', 'order')
 
-
-##############################
-# Question Inline for Quiz
-##############################
-class QuestionInline(admin.StackedInline):
+class QuestionInline(nested_admin.NestedStackedInline):
     model = Question
-    fields = ("order", "text", "explanation")
     extra = 1
-    ordering = ("order",)
-    show_change_link = True
     inlines = [ChoiceInline]
+    sortable_field_name = 'order'
+    fields = ('text', 'explanation', 'order')
+    # если хотите показывать сразу кол-во вариантов:
+    readonly_fields = ()
 
-
-##############################
-# Quiz Admin
-##############################
 @admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
-    list_display = ("title", "topic", "level", "total_questions")
-    list_filter = ("topic", "level")
-    search_fields = ("title", "topic__title", "level__title")
+class QuizAdmin(nested_admin.NestedModelAdmin):
+    list_display = ('title', 'topic', 'level', 'question_count')
+    list_filter = ('topic', 'level')
+    search_fields = ('title',)
     inlines = [QuestionInline]
-
-    def total_questions(self, obj: Quiz) -> int:
-        return obj.questions.count()
-    total_questions.short_description = "Вопросов"
 
 
 ##############################
