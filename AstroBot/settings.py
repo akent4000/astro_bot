@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'jazzmin',
     'admin_reorder',
     'nested_admin',
-    'django_admin_inline_paginator',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
