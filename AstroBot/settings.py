@@ -166,7 +166,7 @@ ADMIN_REORDER = (
         'models': (
             'tgbot.ApodApiKey',
             'tgbot.ApodFile',
-        )
+        ),
     },
     # 📰 Статьи
     {
@@ -176,7 +176,7 @@ ADMIN_REORDER = (
             'tgbot.ArticlesSection',
             'tgbot.ArticlesSubsection',
             'tgbot.Article',
-        )
+        ),
     },
     # ⚙️ Настройки бота
     {
@@ -185,7 +185,42 @@ ADMIN_REORDER = (
         'models': (
             'tgbot.TelegramBotToken',
             'tgbot.Configuration',
-        )
+        ),
+    },
+    # 📖 Глоссарий
+    {
+        'app': 'tgbot',
+        'label': '📖 Глоссарий',
+        'models': (
+            'tgbot.Glossary',
+        ),
+    },
+    # 💡 Интересные факты
+    {
+        'app': 'tgbot',
+        'label': '💡 Интересные факты',
+        'models': (
+            'tgbot.InterestingFact',
+            'tgbot.DailySubscription',
+        ),
+    },
+    # 🔑 SSH и Сервер
+    {
+        'app': 'tgbot',
+        'label': '🔑 SSH и Сервер',
+        'models': (
+            'tgbot.SSHKey',
+            'tgbot.Server',
+        ),
+    },
+    # 👤 Пользователи
+    {
+        'app': 'tgbot',
+        'label': '👤 Пользователи',
+        'models': (
+            'tgbot.TelegramUser',
+            'tgbot.SentMessage',
+        ),
     },
     # 📚 Квизы
     {
@@ -199,7 +234,6 @@ ADMIN_REORDER = (
             'tgbot.Choice',
             'tgbot.UserQuizSession',
             'tgbot.UserQuizAnswer',
-        )
+        ),
     },
-    # при желании — остальные группы по аналогии
 )
