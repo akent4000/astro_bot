@@ -50,10 +50,7 @@ STATIC_ROOT = '/www/static/'
 
 INSTALLED_APPS = [
     'jazzmin',
-    'admin_tools',
-    'admin_tools.theming',    
-    'admin_tools.menu',
-    'admin_tools.dashboard',
+    'admin_reorder'
     'nested_admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -68,6 +65,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'admin_reorder.middleware.ModelAdminReorder',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -160,6 +158,48 @@ JAZZMIN_SETTINGS = {
     "site_brand": "AstroBot",
 }
 
-ADMIN_TOOLS_MENU = 'AstroBot.admin_tools.CustomMenu'
-ADMIN_TOOLS_INDEX_DASHBOARD = 'admin_tools.dashboard.Dashboard'
-ADMIN_TOOLS_APP_INDEX_DASHBOARD = 'admin_tools.dashboard.AppIndexDashboard'
+ADMIN_REORDER = (
+    # 🚀 APOD
+    {
+        'app': 'tgbot',
+        'label': '🚀 APOD',
+        'models': (
+            'tgbot.ApodApiKey',
+            'tgbot.ApodFile',
+        )
+    },
+    # 📰 Статьи
+    {
+        'app': 'tgbot',
+        'label': '📰 Статьи',
+        'models': (
+            'tgbot.ArticlesSection',
+            'tgbot.ArticlesSubsection',
+            'tgbot.Article',
+        )
+    },
+    # ⚙️ Настройки бота
+    {
+        'app': 'tgbot',
+        'label': '⚙️ Настройки бота',
+        'models': (
+            'tgbot.TelegramBotToken',
+            'tgbot.Configuration',
+        )
+    },
+    # 📚 Квизы
+    {
+        'app': 'tgbot',
+        'label': '📚 Квизы',
+        'models': (
+            'tgbot.QuizTopic',
+            'tgbot.QuizLevel',
+            'tgbot.Quiz',
+            'tgbot.Question',
+            'tgbot.Choice',
+            'tgbot.UserQuizSession',
+            'tgbot.UserQuizAnswer',
+        )
+    },
+    # при желании — остальные группы по аналогии
+)
