@@ -49,7 +49,7 @@ STATIC_ROOT = '/www/static/'
 # Application definition
 
 INSTALLED_APPS = [
-    "django_admin_dracula",
+    "material.admin",
     'admin_reorder',
     'nested_inline',
     'django.contrib.auth',
@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.admin',
+    'material.admin.sites',
 
     'tgbot',
     'rangefilter',
