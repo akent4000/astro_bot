@@ -51,7 +51,6 @@ STATIC_ROOT = '/www/static/'
 INSTALLED_APPS = [
     'material',
     'material.admin',
-    'material.admin.default',
     'admin_reorder',
     'nested_inline',
     'django.contrib.admin',
