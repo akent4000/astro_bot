@@ -57,6 +57,41 @@ def _run_main_bot():
 
     logger.info("Поток основного бота завершён")
 
+def _register_test_handlers(test_bot):
+    # Перехват всех обычных текстовых сообщений и «кнопок» reply-клавиатур
+    @test_bot.message_handler(func=lambda m: True)
+    def handle_all_messages(message):
+        from tgbot.user_helper import is_group_chat
+
+        if is_group_chat(message):
+            return
+        test_bot.reply_to(
+            message,
+            "⚠️ *Технические работы*",
+            parse_mode="Markdown"
+        )
+
+    # Перехват любых нажатий на inline-кнопки (callback_query)
+    @test_bot.callback_query_handler(func=lambda call: True)
+    def handle_all_callback_queries(call):
+        from tgbot.user_helper import is_group_chat
+
+        # Если он в группе — игнорируем
+        if is_group_chat(call.message):
+            return
+
+        # Отвечаем на сам callback (чтобы убрать «часики» у кнопки)
+        test_bot.answer_callback_query(
+            callback_query_id=call.id,
+            text="⚠️ Технические работы",
+            show_alert=False
+        )
+        # И дублируем уведомление в чат
+        test_bot.send_message(
+            call.message.chat.id,
+            "⚠️ *Технические работы*",
+            parse_mode="Markdown"
+        )
 
 def _run_test_bot():
     """Постоянный цикл polling для «тестового» бота (только если test_mode=True)."""
@@ -65,12 +100,11 @@ def _run_test_bot():
         logger.warning("Тестовый бот не проинициализирован, завершаем пуллинг тестового бота.")
         return
 
-    # Подключить универсальный обработчик «все сообщения отвечаем, что технические работы»
-    def _register_test_handlers():
+    def _register_test_handlers(test_bot):
+        # Перехват всех обычных сообщений и reply-кнопок
         @test_bot.message_handler(func=lambda m: True)
         def handle_all_messages(message):
             from tgbot.user_helper import is_group_chat
-
             if is_group_chat(message):
                 return
             test_bot.reply_to(
@@ -79,9 +113,25 @@ def _run_test_bot():
                 parse_mode="Markdown"
             )
 
+        # Перехват всех inline callback-кнопок
+        @test_bot.callback_query_handler(func=lambda call: True)
+        def handle_all_callback_queries(call):
+            from tgbot.user_helper import is_group_chat
+            if is_group_chat(call.message):
+                return
+            test_bot.answer_callback_query(
+                callback_query_id=call.id,
+                text="⚠️ Технические работы",
+                show_alert=False
+            )
+            test_bot.send_message(
+                call.message.chat.id,
+                "⚠️ *Технические работы*",
+                parse_mode="Markdown"
+            )
+
     while True:
         try:
-            # Проверяем флаг test_mode в базе
             if Configuration.get_solo().test_mode:
                 logger.info("Тестовый бот: запуск polling")
                 _register_test_handlers()
@@ -92,7 +142,6 @@ def _run_test_bot():
                     skip_pending=True
                 )
             else:
-                # Если test_mode отключён, просто ждём небольшую паузу
                 time.sleep(1)
         except Exception as e:
             logger.error(f"Ошибка в тестовом боте: {e}\n{traceback.format_exc()}")
@@ -103,7 +152,6 @@ def _run_test_bot():
             time.sleep(1)
             logger.info("Перезапуск тестового бота...")
         else:
-            # Если polling завершился без исключений — выходим
             break
 
     logger.info("Поток тестового бота завершён")
