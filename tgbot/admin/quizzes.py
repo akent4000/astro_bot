@@ -36,7 +36,7 @@ class QuizLevelAdmin(admin.ModelAdmin):
 
 class ChoiceInline(nested_admin.NestedTabularInline):
     class Media:
-        css = {'all': ('admin/css/compact_quiz.css',)}
+        css = {'all': ('css/quiz_compact.css',)}
     model = Choice
     extra = 0            # не показывать сразу пустые
     min_num = 1          # минимум один вариант
@@ -50,7 +50,7 @@ class ChoiceInline(nested_admin.NestedTabularInline):
 
 class QuestionInline(nested_admin.NestedTabularInline):
     class Media:
-        css = {'all': ('admin/css/compact_quiz.css',)}
+        css = {'all': ('css/quiz_compact.css',)}
     model = Question
     inlines = [ChoiceInline]
     extra = 0
