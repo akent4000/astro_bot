@@ -71,28 +71,6 @@ def _register_test_handlers(test_bot):
             parse_mode="Markdown"
         )
 
-    # Перехват любых нажатий на inline-кнопки (callback_query)
-    @test_bot.callback_query_handler(func=lambda call: True)
-    def handle_all_callback_queries(call):
-        from tgbot.user_helper import is_group_chat
-
-        # Если он в группе — игнорируем
-        if is_group_chat(call.message):
-            return
-
-        # Отвечаем на сам callback (чтобы убрать «часики» у кнопки)
-        test_bot.answer_callback_query(
-            callback_query_id=call.id,
-            text="⚠️ Технические работы",
-            show_alert=False
-        )
-        # И дублируем уведомление в чат
-        test_bot.send_message(
-            call.message.chat.id,
-            "⚠️ *Технические работы*",
-            parse_mode="Markdown"
-        )
-
 def _run_test_bot():
     """Постоянный цикл polling для «тестового» бота (только если test_mode=True)."""
     test_bot = dispatcher.get_test_bot()
@@ -100,7 +78,7 @@ def _run_test_bot():
         logger.warning("Тестовый бот не проинициализирован, завершаем пуллинг тестового бота.")
         return
 
-    def _register_test_handlers(test_bot):
+    def _register_test_handlers():
         # Перехват всех обычных сообщений и reply-кнопок
         @test_bot.message_handler(func=lambda m: True)
         def handle_all_messages(message):
