@@ -74,3 +74,27 @@
   background-color: var(--admin-bg) !important;
   border-bottom: none !important;
 }
+
+/* SUBMIT ROW (адаптировано под темно-фиолетовую тему) */
+.submit-row {
+    padding: 5px 7px !important;
+    text-align: right !important;
+    background-color: var(--admin-sidebar-bg) !important;
+    border: 1px solid var(--admin-border) !important;
+    margin: 5px 0 !important;
+    overflow: hidden !important;
+}
+.submit-row input {
+    background-color: var(--admin-primary) !important;
+    border-color: var(--admin-secondary) !important;
+    color: var(--admin-text-main) !important;
+}
+.submit-row input:hover {
+    background-color: var(--admin-hover) !important;
+}
+/* Иконка “удалить” внутри submit-row */
+.submit-row .deletelink {
+    color: var(--admin-text-secondary) !important;
+    background: url('../img/icon-deletelink.svg') 0 50% no-repeat !important;
+    padding-left: 14px !important;
+}
