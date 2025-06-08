@@ -84,3 +84,23 @@
   overflow: hidden !important;
   text-align: right !important;
 }
+
+form h4 {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    /* если нужно, можно задать цвет заголовка */
+    color: var(--admin-text-main) !important;
+}
+
+label {
+    font-weight: normal !important;
+    color: var(--admin-text-secondary) !important; /* вместо #dfabab */
+    font-size: 12px !important;
+}
+
+.required label,
+label.required {
+    font-weight: bold !important;
+    color: var(--admin-text-main) !important; /* вместо #dac0c0 */
+}
