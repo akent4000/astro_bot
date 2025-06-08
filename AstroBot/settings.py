@@ -235,3 +235,17 @@ ADMIN_REORDER = (
         ),
     },
 )
+
+from django.utils.translation import gettext_lazy as _
+
+MATERIAL_ADMIN_SITE = {
+    'HEADER':  _('AstroBot Admin'),        # заголовок в шапке
+    'TITLE':   _('AstroBot Dashboard'),    # title в браузере
+    'FAVICON': 'admin/images/favicon.ico',  # путь в STATIC
+    'MAIN_BG_COLOR':    '#203a43',          # основной цвет фона
+    'MAIN_HOVER_COLOR': '#1f2a36',          # hover-цвет
+    'SHOW_THEMES':      False,              # скрыть кнопку смены темы
+    'TRAY_REVERSE':     False,              # не инвертировать tray
+    'NAVBAR_REVERSE':   False,              # не инвертировать navbar
+    'SHOW_COUNTS':      True,               # показывать число записей в меню
+}
