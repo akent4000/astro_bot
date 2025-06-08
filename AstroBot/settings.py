@@ -51,7 +51,7 @@ STATIC_ROOT = '/www/static/'
 INSTALLED_APPS = [
     'jazzmin',
     'admin_reorder',
-    'nested-inline',
+    'nested_inline',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
