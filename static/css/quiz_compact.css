@@ -1,53 +1,34 @@
-/* подгружается после collectstatic */
-table.inline-related {
-  table-layout: fixed;
-  width: 100%;
-}
-
-/* «Изменить» */
-table.inline-related col.col-change {
-  width: 4em;
-}
-
-/* Текст вопроса / варианта */
-table.inline-related col.col-text {
-  width: 60%;
-}
-
-/* Порядок */
-table.inline-related col.col-order {
-  width: 10%;
-}
-
-/* Правильный ответ (для ChoiceInline) */
-table.inline-related col.col-is_correct {
-  width: 5%;
-}
-
-/* Чекбокс «Удалить?» */
-table.inline-related col.col-delete {
-  width: 5%;
-}
-
-/* Подстройка инпутов */
-table.inline-related input {
-  font-size: 0.9em;
-}
-
-.nested_admin .inline-related,
-table.inline-related {
+/* 1) Убедитесь, что селектор ловит все таблички nested_admin */
+.nested_admin table.inline-related {
   table-layout: fixed !important;
   width: 100% !important;
 }
-.nested_admin .inline-related td,
-.nested_admin .inline-related th {
-  overflow: hidden;
+
+/* 2) Привязываем ширину к th и совпадающим td */
+.nested_admin table.inline-related th.col-text,
+.nested_admin table.inline-related td.field-text {
+  width: 60% !important;
+}
+.nested_admin table.inline-related th.col-explanation,
+.nested_admin table.inline-related td.field-explanation {
+  width: 20% !important;
+}
+.nested_admin table.inline-related th.col-order,
+.nested_admin table.inline-related td.field-order {
+  width: 10% !important;
+}
+.nested_admin table.inline-related th.col-is_correct,
+.nested_admin table.inline-related td.field-is_correct {
+  width: 5% !important;
+}
+.nested_admin table.inline-related th.delete,
+.nested_admin table.inline-related td.delete {
+  width: 5% !important;
 }
 
-/* ---- а дальше ваши прописанные правила по колонкам ---- */
-table.inline-related col.col-change { width: 4em; }
-table.inline-related col.col-text   { width: 60%; }
-table.inline-related col.col-explanation { width: 20%; }
-table.inline-related col.col-order { width: 10%; }
-table.inline-related col.col-is_correct { width: 5%; }
-table.inline-related col.col-delete  { width: 5%; }
+/* 3) Немного отступов, чтобы выглядело аккуратно */
+.nested_admin table.inline-related th,
+.nested_admin table.inline-related td {
+  padding: .5em 1em;
+  vertical-align: middle;
+}
