@@ -1,1 +1,70 @@
 #instructions-block { display: none; margin-top: 20px; }
+
+/* static/css/admin_dark_purple.css */
+
+:root {
+  --admin-bg: #1f0034;
+  --admin-sidebar-bg: #2e003f;
+  --admin-nav-bg: #3c0054;
+  --admin-primary: #7c38a3;
+  --admin-secondary: #9c5eb6;
+  --admin-hover: #b27ed0;
+  --admin-text-main: #e0dbea;
+  --admin-text-secondary: #b8a8cc;
+  --admin-border: #4a004a;
+}
+
+/* Общее тело */
+body {
+  background-color: var(--admin-bg) !important;
+  color: var(--admin-text-main) !important;
+}
+
+/* Верхний бар */
+#header, .navbar {
+  background-color: var(--admin-nav-bg) !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+/* Лого и название */
+#branding h1, #branding h1 a {
+  color: var(--admin-text-main) !important;
+}
+
+/* Сайдбар */
+#nav-sidebar {
+  background-color: var(--admin-sidebar-bg) !important;
+  border-right: 1px solid var(--admin-border) !important;
+}
+#nav-sidebar .model, #nav-sidebar .app-list li a {
+  color: var(--admin-text-main) !important;
+}
+#nav-sidebar .model:hover, #nav-sidebar .app-list li a:hover {
+  background-color: var(--admin-hover) !important;
+}
+
+/* Кнопки */
+.button, input[type="submit"], .deletelink {
+  background-color: var(--admin-primary) !important;
+  border-color: var(--admin-secondary) !important;
+  color: var(--admin-text-main) !important;
+}
+.button:hover, input[type="submit"]:hover, .deletelink:hover {
+  background-color: var(--admin-hover) !important;
+}
+
+/* Таблицы в списках */
+.change-list table {
+  border-color: var(--admin-border) !important;
+}
+.change-list th {
+  background-color: var(--admin-sidebar-bg) !important;
+  color: var(--admin-text-main) !important;
+}
+.change-list td {
+  background-color: var(--admin-bg) !important;
+  color: var(--admin-text-main) !important;
+}
+.change-list tr:hover td {
+  background-color: var(--admin-hover) !important;
+}
