@@ -49,9 +49,9 @@ STATIC_ROOT = '/www/static/'
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    #'jazzmin',
     'admin_reorder',
-    'super_inlines',
+    'nested_inline',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -238,69 +238,69 @@ ADMIN_REORDER = (
     },
 )
 
-JAZZMIN_SETTINGS = {
-    # (другие ваши настройки Jazzmin: site_title, site_header и т.д.)
+# JAZZMIN_SETTINGS = {
+#     # (другие ваши настройки Jazzmin: site_title, site_header и т.д.)
 
-    "navigation": [
-        # 🚀 APOD
-        {
-            "app": "tgbot",
-            "models": ["tgbot.apodapikey", "tgbot.apodfile"],
-            "label": "🚀 APOD",
-        },
-        # 📰 Статьи
-        {
-            "app": "tgbot",
-            "models": [
-                "tgbot.articlessection",
-                "tgbot.articlessubsection",
-                "tgbot.article",
-            ],
-            "label": "📰 Статьи",
-        },
-        # ⚙️ Настройки бота
-        {
-            "app": "tgbot",
-            "models": ["tgbot.telegrambottoken", "tgbot.configuration"],
-            "label": "⚙️ Настройки бота",
-        },
-        # 📖 Глоссарий
-        {
-            "app": "tgbot",
-            "models": ["tgbot.glossary"],
-            "label": "📖 Глоссарий",
-        },
-        # 💡 Интересные факты
-        {
-            "app": "tgbot",
-            "models": ["tgbot.interestingfact", "tgbot.dailysubscription"],
-            "label": "💡 Интересные факты",
-        },
-        # 🔑 SSH и Сервер
-        {
-            "app": "tgbot",
-            "models": ["tgbot.sshkey", "tgbot.server"],
-            "label": "🔑 SSH и Сервер",
-        },
-        # 👤 Пользователи
-        {
-            "app": "tgbot",
-            "models": ["tgbot.telegramuser", "tgbot.sentmessage"],
-            "label": "👤 Пользователи",
-        },
-        # 📚 Квизы
-        {
-            "app": "tgbot",
-            "models": [
-                "tgbot.quiztopic",
-                "tgbot.quizlevel",
-                "tgbot.quiz",
-                "tgbot.question",
-                "tgbot.choice",
-                "tgbot.userquizsession",
-                "tgbot.userquizanswer",
-            ],
-            "label": "📚 Квизы",
-        },
-    ]
-}
+#     "navigation": [
+#         # 🚀 APOD
+#         {
+#             "app": "tgbot",
+#             "models": ["tgbot.apodapikey", "tgbot.apodfile"],
+#             "label": "🚀 APOD",
+#         },
+#         # 📰 Статьи
+#         {
+#             "app": "tgbot",
+#             "models": [
+#                 "tgbot.articlessection",
+#                 "tgbot.articlessubsection",
+#                 "tgbot.article",
+#             ],
+#             "label": "📰 Статьи",
+#         },
+#         # ⚙️ Настройки бота
+#         {
+#             "app": "tgbot",
+#             "models": ["tgbot.telegrambottoken", "tgbot.configuration"],
+#             "label": "⚙️ Настройки бота",
+#         },
+#         # 📖 Глоссарий
+#         {
+#             "app": "tgbot",
+#             "models": ["tgbot.glossary"],
+#             "label": "📖 Глоссарий",
+#         },
+#         # 💡 Интересные факты
+#         {
+#             "app": "tgbot",
+#             "models": ["tgbot.interestingfact", "tgbot.dailysubscription"],
+#             "label": "💡 Интересные факты",
+#         },
+#         # 🔑 SSH и Сервер
+#         {
+#             "app": "tgbot",
+#             "models": ["tgbot.sshkey", "tgbot.server"],
+#             "label": "🔑 SSH и Сервер",
+#         },
+#         # 👤 Пользователи
+#         {
+#             "app": "tgbot",
+#             "models": ["tgbot.telegramuser", "tgbot.sentmessage"],
+#             "label": "👤 Пользователи",
+#         },
+#         # 📚 Квизы
+#         {
+#             "app": "tgbot",
+#             "models": [
+#                 "tgbot.quiztopic",
+#                 "tgbot.quizlevel",
+#                 "tgbot.quiz",
+#                 "tgbot.question",
+#                 "tgbot.choice",
+#                 "tgbot.userquizsession",
+#                 "tgbot.userquizanswer",
+#             ],
+#             "label": "📚 Квизы",
+#         },
+#     ]
+# }

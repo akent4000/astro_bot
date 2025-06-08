@@ -1,5 +1,5 @@
 # tgbot/admin/quiz.py
-from super_inlines.admin import SuperTabularInline, SuperInlineModelAdmin
+from nested_inline.admin import NestedTabularInline, NestedModelAdmin
 from django.contrib import admin
 from django.db import models
 from django.utils import timezone
@@ -35,25 +35,33 @@ class QuizLevelAdmin(admin.ModelAdmin):
 
 
 
-class ChoiceInline(SuperTabularInline):
+class ChoiceInline(NestedTabularInline):
     model = Choice
     extra = 0
     min_num = 1
-    fields = ('text', 'is_correct', 'order')
     sortable_field_name = 'order'
+    fields = ('text', 'is_correct', 'order')
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': 30})},
+    }
 
-class QuestionInline(SuperTabularInline):
+class QuestionInline(NestedTabularInline):
     model = Question
     inlines = [ChoiceInline]
     extra = 0
-    fields = ('text', 'explanation', 'order')
     sortable_field_name = 'order'
+    fields = ('text', 'explanation', 'order')
+    formfield_overrides = {
+        models.TextField: {'widget': TextInput(attrs={'size': 50})},
+    }
     show_change_link = True
 
 @admin.register(Quiz)
-class QuizAdmin(SuperInlineModelAdmin):
-    list_display = ('title','topic','level')
+class QuizAdmin(NestedModelAdmin):
+    list_display = ('title', 'topic', 'level', 'question_count')
     inlines = [QuestionInline]
+    save_on_top = True
+    ordering = ('-id',)
 
 
 ##############################
