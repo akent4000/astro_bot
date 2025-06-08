@@ -153,12 +153,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-JAZZMIN_SETTINGS = {
-    "site_title": "AstroBot",
-    "site_header": "AstroBot",
-    "site_brand": "AstroBot",
-}
-
 ADMIN_REORDER = (
     # 🚀 APOD
     {
@@ -242,7 +236,6 @@ ADMIN_REORDER = (
         'label': '⚙️ Admin Interface',
         'models': (
             'admin_interface.Theme',
-            'admin_interface.Settings',
         ),
     },
 )
