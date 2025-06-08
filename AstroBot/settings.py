@@ -237,4 +237,12 @@ ADMIN_REORDER = (
             'tgbot.UserQuizAnswer',
         ),
     },
+    {
+        'app': 'admin_interface',
+        'label': '⚙️ Admin Interface',
+        'models': (
+            'admin_interface.Theme',
+            'admin_interface.Settings',
+        ),
+    },
 )
