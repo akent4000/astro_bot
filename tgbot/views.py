@@ -58,3 +58,6 @@ def quiz_editor(request, pk=None):
         'choice_formsets': choice_formsets,
     }
     return render(request, 'quiz_editor.html', context)
+
+def home(request):
+    return render(request, 'index.html')

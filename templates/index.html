@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>AstroBot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 4em auto;
+      padding: 0 1em;
+      line-height: 1.6;
+      color: #333;
+    }
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 2em;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>AstroBot</h1>
+    <p>Это страница Telegram-бота AstroBot</p>
+  </div>
+
+  <p>Добро пожаловать! Здесь вы можете управлять контентом бота через административную панель.</p>
+
+  <p><a href="{% url 'admin:index' %}">Войти в админку</a></p>
+</body>
+</html>
