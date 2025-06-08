@@ -321,11 +321,23 @@ class SendMessages:
 
             except APODClientError as e:
                 logger.error(f"Apod.send_apod: ошибка при получении APOD: {e}")
-                bot.send_message(chat_id, f"Ошибка при получении APOD: {e}")
+                SendMessages.update_or_replace_last_message(
+                    user,
+                    False,
+                    text=Messages.APOD_ERROR,
+                    reply_markup=Keyboards.Apod.back_to_menu(),
+                    parse_mode="Markdown"
+                )
 
-            except Exception:
-                logger.exception("Apod.send_apod: внутренняя ошибка при отправке APOD")
-                bot.send_message(chat_id, "Произошла внутренняя ошибка при отправке APOD.")
+            except Exception as e:
+                logger.error(f"Apod.send_apod: внутренняя ошибка при отправке APOD: {e}")
+                SendMessages.update_or_replace_last_message(
+                    user,
+                    False,
+                    text=Messages.APOD_BOT_ERROR,
+                    reply_markup=Keyboards.Apod.back_to_menu(),
+                    parse_mode="Markdown"
+                )
 
     class IntFacts:
         @staticmethod

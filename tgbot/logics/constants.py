@@ -121,7 +121,8 @@ class Messages:
     MISSING_PARAMETERS_ERROR = "❌ Ошибка: отсутствуют параметры."
     INCORRECT_VALUE_ERROR = "⚠️ Ошибка: неверное значение для {key}."
     NOT_FOUND_ERROR = "❌ {item} не найден."
-
+    APOD_ERROR = "❌ Ошибка при обращении к APOD API"
+    APOD_BOT_ERROR = "❌ Произошла внутренняя ошибка при отправке APOD"
 
 class CommandsNames:
     START = "Старт бота и показ меню"
