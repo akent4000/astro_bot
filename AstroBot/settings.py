@@ -49,8 +49,7 @@ STATIC_ROOT = '/www/static/'
 # Application definition
 
 INSTALLED_APPS = [
-    'admin_interface',
-    'colorfield',
+    "django_admin_dracula",
     'admin_reorder',
     'nested_inline',
     'django.contrib.auth',
