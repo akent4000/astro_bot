@@ -1,0 +1,76 @@
+@import url('widgets.css');        /* ваш базовый импорт */
+@import url('nested-forms.css');   /* исходные стили nested-forms */
+
+/* Общая обёртка вложенных форм */
+.inline-group {
+  border: 1px solid var(--admin-border) !important;
+  background-color: var(--admin-bg) !important;
+  margin: 10px 0 !important;
+  padding: 5px !important;
+}
+
+/* Заголовки вложенных форм */
+.inline-related h3 {
+  background-color: var(--admin-nav-bg) !important;
+  color: var(--admin-text-main) !important;
+  padding: 6px 10px !important;
+  font-size: 11px !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+/* Кнопка удаления в заголовке */
+.inline-related h3 span.delete label {
+  color: var(--admin-text-secondary) !important;
+}
+
+/* Поля внутри модуля */
+.inline-related fieldset {
+  background: var(--admin-bg) !important;
+  border: none !important;
+  padding: 10px 0 !important;
+}
+
+/* Модули внутри табличного inline */
+.inline-group .tabular > fieldset.module {
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+/* Строка “Add another” */
+.inline-group div.add-row,
+.inline-group .tabular tr.add-row td {
+  background-color: var(--admin-sidebar-bg) !important;
+  color: var(--admin-text-secondary) !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+/* Ссылка “Add” */
+.inline-group ul.tools a.add,
+.inline-group div.add-row a,
+.inline-group .tabular tr.add-row td a {
+  padding-left: 20px !important;
+  background: url('../img/icon-addlink.svg') 0 50% no-repeat !important;
+  color: var(--admin-text-main) !important;
+}
+
+/* Вложенные inline-блоки */
+.nested-inline {
+  margin: 5px !important;
+  padding: 5px !important;
+  border: 1px solid var(--admin-border) !important;
+  background-color: var(--admin-bg) !important;
+}
+
+/* Нижняя рамка у вложенных inline */
+.nested-inline-bottom-border {
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+
+/* Альтернативные строки без нижней границы */
+.no-bottom-border.row1 > td {
+  background-color: var(--admin-sidebar-bg) !important;
+  border-bottom: 1px solid var(--admin-border) !important;
+}
+.no-bottom-border.row2 > td {
+  background-color: var(--admin-bg) !important;
+  border-bottom: none !important;
+}
