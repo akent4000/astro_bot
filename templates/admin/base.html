@@ -1,8 +1,17 @@
 {# templates/admin/base.html #}
 {% extends "admin/base.html" %}
+{% extends "admin_interface/base.html" %}
 {% load static %}
 
 {% block extrahead %}
   {{ block.super }}
   <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'admin/css/theme.css' %}"
+        media="all" />
+  <link rel="stylesheet"
+        type="text/css"
+        href="{% static 'admin/css/theme-dark.css' %}"
+        media="(prefers-color-scheme: dark)" />
 {% endblock %}
