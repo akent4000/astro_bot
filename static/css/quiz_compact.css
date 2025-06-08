@@ -1,44 +1,44 @@
-/* ловим все вложенные inlines */
-.nested_admin table.inline-related {
+/* 1) Применяем фиксированную раскладку */
+.djn-items.inline-related {
   table-layout: fixed !important;
   width: 100% !important;
 }
 
-/* колонка «Исходный объект» (название вопроса/варианта) */
-.nested_admin table.inline-related thead th:nth-child(1),
-.nested_admin table.inline-related tbody td.original {
-  /* здесь оставьте на усмотрение: можно 20% или auto */
+/* 2) Общие отступы */
+.djn-items.inline-related thead th,
+.djn-items.inline-related tbody td {
+  padding: 0.5em 0.75em;
+  vertical-align: middle;
+}
+
+/* 3) Равняем по колонкам через nth-child */
+/* первая колонка – «оригинал» (drag-handler + плашка с текстом вопроса/варианта) */
+.djn-items.inline-related thead th:nth-child(1),
+.djn-items.inline-related tbody td:nth-child(1) {
   width: 25% !important;
 }
 
-/* колонка Текст варианта ответа */
-.nested_admin table.inline-related thead th:nth-child(2),
-.nested_admin table.inline-related tbody td.field-text {
+/* вторая – текст варианта */
+.djn-items.inline-related thead th:nth-child(2),
+.djn-items.inline-related tbody td:nth-child(2) {
   width: 45% !important;
 }
 
-/* колонка Правильный ответ */
-.nested_admin table.inline-related thead th:nth-child(3),
-.nested_admin table.inline-related tbody td.field-is_correct {
+/* третья – чекбокс «Правильный ответ» */
+.djn-items.inline-related thead th:nth-child(3),
+.djn-items.inline-related tbody td:nth-child(3) {
   width: 10% !important;
   text-align: center;
 }
 
-/* колонка Порядок варианта */
-.nested_admin table.inline-related thead th:nth-child(4),
-.nested_admin table.inline-related tbody td.field-order {
+/* четвёртая – порядок */
+.djn-items.inline-related thead th:nth-child(4),
+.djn-items.inline-related tbody td:nth-child(4) {
   width: 15% !important;
 }
 
-/* колонка «Удалить?» */
-.nested_admin table.inline-related thead th:nth-child(5),
-.nested_admin table.inline-related tbody td.delete {
+/* пятая – удалить */
+.djn-items.inline-related thead th:nth-child(5),
+.djn-items.inline-related tbody td:nth-child(5) {
   width: 5% !important;
-}
-
-/* чуть отступов для читабельности */
-.nested_admin table.inline-related th,
-.nested_admin table.inline-related td {
-  padding: .5em .75em;
-  vertical-align: middle;
 }
