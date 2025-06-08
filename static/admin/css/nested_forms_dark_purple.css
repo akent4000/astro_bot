@@ -1,5 +1,5 @@
 @import url('widgets.css');        /* ваш базовый импорт */
-@import url('nested-forms.css');   /* исходные стили nested-forms */
+@import url('forms-nested.css');   /* исходные стили nested-forms */
 
 /* Общая обёртка вложенных форм */
 .inline-group {
