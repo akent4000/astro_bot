@@ -1,71 +1,97 @@
-  <!DOCTYPE html>
-  <html lang="ru">
-  <head>
-    <meta charset="UTF-8">
-    <title>AstroBot</n  metatag>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-      /* Общие стили */
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-        color: #f0f0f0;
-        line-height: 1.6;
-      }
-      .container {
-        max-width: 600px;
-        margin: 5em auto;
-        padding: 2em;
-        background: rgba(255,255,255,0.1);
-        border-radius: 10px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        backdrop-filter: blur(10px);
-      }
-      .header {
-        text-align: center;
-        margin-bottom: 1.5em;
-      }
-      h1 {
-        margin: 0;
-        font-size: 2.5em;
-      }
-      p {
-        margin-bottom: 1em;
-      }
-      .btn {
-        display: inline-block;
-        background: #1a73e8;
-        color: #fff;
-        text-decoration: none;
-        padding: 0.75em 1.5em;
-        border-radius: 5px;
-        transition: background 0.3s ease;
-        font-weight: bold;
-      }
-      .btn:hover {
-        background: #1558b0;
-      }
-      .footer {
-        text-align: center;
-        font-size: 0.9em;
-        margin-top: 2em;
-        opacity: 0.8;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>AstroBot</h1>
-        <p>Телеграм‑бот для астрономии и космических фактов</p>
-      </div>
-      <p>Добро пожаловать на сайт бота AstroBot. Здесь вы можете управлять контентом и настройками через административную панель.</p>
-      <p style="text-align: center;"><a href="{% url 'admin:index' %}" class="btn">Войти в админку</a></p>
-      <div class="footer">
-        &copy; AstroBot, 2025
-      </div>
-    </div>
-  </body>
-  </html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>AstroBot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Подключаем Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a73e8;
+      --primary-hover: #1666c1;
+      --bg-gradient-from: #0f2027;
+      --bg-gradient-to: #203a43;
+      --card-bg: #ffffffee;
+      --text-color: #333;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: var(--text-color);
+      background: linear-gradient(135deg, var(--bg-gradient-from), var(--bg-gradient-to));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1em;
+    }
+    .container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      max-width: 400px;
+      width: 100%;
+      padding: 2em;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+      font-weight: 700;
+    }
+    p.lead {
+      font-size: 1.1em;
+      margin-bottom: 1.5em;
+      color: #555;
+    }
+    .btn {
+      display: inline-block;
+      padding: 0.75em 1.5em;
+      font-size: 1em;
+      font-weight: 500;
+      color: #fff;
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1em;
+      background: var(--primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 2em;
+      font-weight: 700;
+    }
+    @media (max-width: 480px) {
+      .container { padding: 1.5em; }
+      h1 { font-size: 1.75em; }
+      .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">AB</div>
+    <h1>AstroBot</h1>
+    <p class="lead">Это страница Telegram-бота AstroBot</p>
+    <p>Здесь вы можете управлять контентом бота через административную панель.</p>
+    <a href="{% url 'admin:index' %}" class="btn">Войти в админку</a>
+  </div>
+</body>
+</html>
