@@ -51,6 +51,7 @@ STATIC_ROOT = '/www/static/'
 INSTALLED_APPS = [
     'material',
     'material.admin',
+    'material.admin.default',
     'admin_reorder',
     'nested_inline',
     'django.contrib.admin',
@@ -232,13 +233,6 @@ ADMIN_REORDER = (
             'tgbot.Choice',
             'tgbot.UserQuizSession',
             'tgbot.UserQuizAnswer',
-        ),
-    },
-    {
-        'app': 'admin_interface',
-        'label': '⚙️ Admin Interface',
-        'models': (
-            'admin_interface.Theme',
         ),
     },
 )
