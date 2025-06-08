@@ -84,35 +84,3 @@
   overflow: hidden !important;
   text-align: right !important;
 }
-
-/* Все кнопки submit */
-.submit-row input[type="submit"] {
-  background-color: var(--admin-secondary) !important;
-  border: 1px solid var(--admin-border) !important;
-  color:            var(--admin-text-main) !important;
-  border-radius:    3px !important;
-  padding:          4px 10px !important;
-  font-size:        11px !important;
-  margin-left:      5px !important;
-  cursor:           pointer !important;
-}
-
-/* Главная кнопка “Сохранить” */
-.submit-row input.default {
-  background-color: var(--admin-primary) !important;
-  border-color:     var(--admin-secondary) !important;
-}
-
-/* Hover-состояние */
-.submit-row input[type="submit"]:hover {
-  background-color: var(--admin-hover) !important;
-  border-color:     var(--admin-secondary) !important;
-  color:            var(--admin-text-main) !important;
-}
-
-/* Иконка “удалить” (если есть) */
-.submit-row .deletelink {
-  background: url('../img/icon-deletelink.svg') 0 50% no-repeat !important;
-  padding-left: 14px !important;
-  color: var(--admin-text-secondary) !important;
-}
