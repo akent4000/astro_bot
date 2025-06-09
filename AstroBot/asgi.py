@@ -17,7 +17,8 @@ from tgbot.bot_instances import instances
 from tgbot.scheduler import run_scheduler
 from tgbot.models import Configuration
 from tgbot.logics.constants import Constants, Messages
-
+from telebot.apihelper import ApiTelegramException
+import time
 # И создаём папку под логи
 Path("logs").mkdir(parents=True, exist_ok=True)
 logger.add("logs/asgi.log", rotation="10 MB", level="INFO")
@@ -33,16 +34,28 @@ def _run_main_bot():
     import tgbot.handlers.int_facts
     import tgbot.handlers.articles
     import tgbot.handlers.quzzes
-
-    try:
-        logger.info("Основной бот: установка webhook")
-        url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
-        bot.remove_webhook()
-        bot.set_webhook(url=url)
-        instances[Constants.MAIN_BOT_WH_I] = bot
-        logger.info("Основной бот: webhook успешно установлен")
-    except Exception:
-        logger.exception("Ошибка при установке webhook у основного бота")
+    instances[Constants.MAIN_BOT_WH_I] = bot
+    url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
+    if cache.add("telegram_webhook_set", True, timeout=24*3600):
+        # безопасный вызов с учётом 429
+        max_retries = 3
+        for attempt in range(1, max_retries+1):
+            try:
+                bot.remove_webhook()
+                bot.set_webhook(url=url)
+                logger.info("Webhook установлен в воркере PID %s", os.getpid())
+                break
+            except ApiTelegramException as e:
+                if e.error_code == 429:
+                    retry_after = e.result_json.get("parameters", {}).get("retry_after", 1)
+                    logger.warning("429 retry after %s", retry_after)
+                    time.sleep(retry_after)
+                    continue
+                else:
+                    logger.exception("Ошибка set_webhook: %s", e)
+                    break
+    else:
+        logger.info("Webhook уже установлен другим воркером, PID %s пропускает", os.getpid())
 
 
 def _run_test_bot():
@@ -91,20 +104,22 @@ def start_bots():
 
 # 4) Запускаем ботов уже в правильно инициализированном контексте
 async def application(scope, receive, send):
+    """
+    ASGI router that:
+      – on lifespan.startup → kicks off start_bots()
+      – on lifespan.shutdown → acks and quits
+      – otherwise → delegates to Django’s HTTP/Websocket handlers
+    """
     if scope['type'] == 'lifespan':
         while True:
             message = await receive()
             if message['type'] == 'lifespan.startup':
-                # Попытаемся установить флаг — только первый воркер увидит True
-                if cache.add("tgbot_bots_started", True, timeout=24*3600):
-                    # первый успешно "захватывает" запуск
-                    threading.Thread(target=start_bots, daemon=True).start()
-                    logger.info("start_bots() запущен первым воркером")
-                else:
-                    logger.info("start_bots() уже был запущен другим воркером — пропускаем")
+                # Django is fully initialized now
+                threading.Thread(target=start_bots, daemon=True).start()
                 await send({'type': 'lifespan.startup.complete'})
             elif message['type'] == 'lifespan.shutdown':
                 await send({'type': 'lifespan.shutdown.complete'})
                 return
     else:
+        # HTTP or WebSocket → hand off to Django
         await django_app(scope, receive, send)
