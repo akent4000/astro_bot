@@ -11,6 +11,7 @@ from tgbot.logics.keyboards import *
 
 from pathlib import Path
 from loguru import logger
+from cachetools import TTLCache, cached
 
 # Убедимся, что папка logs существует
 Path("logs").mkdir(parents=True, exist_ok=True)
@@ -51,8 +52,8 @@ def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message
         if error_message:
             bot.answer_callback_query(call.id, Messages.INCORRECT_VALUE_ERROR.format(key=key))
         return None
-    
+
+get_callback_name_from_call_cache = TTLCache(maxsize=100, ttl=3)
+@cached(get_callback_name_from_call_cache)
 def get_callback_name_from_call(call: CallbackQuery):
-    logger.debug(call.data)
-    logger.debug(call.data.split("?", 1)[0])
     return call.data.split("?", 1)[0]
