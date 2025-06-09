@@ -11,6 +11,7 @@ application = get_asgi_application()
 
 # 3) Теперь безопасно работать с ORM
 from loguru import logger
+import threading
 from tgbot import dispatcher
 from tgbot.bot_instances import instances
 from tgbot.scheduler import run_scheduler
@@ -99,4 +100,4 @@ def start_bots():
     # threading.Event().wait()
 
 # 4) Запускаем ботов при импорте asgi.py, но уже в полностью инициализированном Django
-start_bots()
+threading.Thread(target=start_bots, daemon=True).start()
