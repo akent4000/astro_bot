@@ -43,14 +43,14 @@ def _initialize_bot(token: str) -> SyncBot:
     return bot
 
 
-def get_main_bot() -> SyncBot:
+def get_main_bot(clear=False) -> SyncBot:
     """
     Возвращает «главный» бот (SyncBot), инициализируя его при первом вызове.
     Если в Configuration.test_mode включен тестовый режим, токены меняются местами.
     """
     global _main_bot
 
-    if _main_bot is not None:
+    if _main_bot is not None and not clear:
         logger.debug("get_main_bot: возвращаем ранее созданный экземпляр")
         return _main_bot
 
@@ -81,14 +81,14 @@ def get_main_bot() -> SyncBot:
     return _main_bot
 
 
-def get_test_bot() -> SyncBot:
+def get_test_bot(clear=False) -> SyncBot:
     """
     Возвращает «тестовый» бот (SyncBot), инициализируя его при первом вызове.
     Если в Configuration.test_mode включен тестовый режим, токены меняются местами.
     """
     global _test_bot
 
-    if _test_bot is not None:
+    if _test_bot is not None and not clear:
         logger.debug("get_test_bot: возвращаем ранее созданный экземпляр")
         return _test_bot
 
