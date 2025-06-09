@@ -169,7 +169,7 @@ def start_bots():
         logger.info("Scheduler уже запущен другим воркером")
 
     # Watcher — **каждый** воркер
-    threading.Thread(target=_watch_config_changes, daemon=True).start()
+    #threading.Thread(target=_watch_config_changes, daemon=True).start()
     logger.info("Запущен watcher конфигурации (PID %s)", os.getpid())
 
 
