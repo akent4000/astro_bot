@@ -1,5 +1,5 @@
 from telebot.types import CallbackQuery
-from tgbot.dispatcher import get_main_bot, dispa
+from tgbot.dispatcher import get_main_bot
 from tgbot.logics.messages import SendMessages
 from tgbot.logics.constants import CallbackData, Messages
 from tgbot.models import ArticlesSection, ArticlesSubsection, Choice, QuizTopic, QuizLevel, Quiz, UserQuizAnswer, UserQuizSession
