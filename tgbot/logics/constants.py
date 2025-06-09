@@ -131,5 +131,7 @@ class Messages:
     APOD_ERROR = "❌ Ошибка при обращении к APOD API"
     APOD_BOT_ERROR = "❌ Произошла внутренняя ошибка при отправке APOD"
 
+    IN_TEST_MODE_MESSAGE = "⚠️ *Технические работы*"
+
 class CommandsNames:
     START = "Старт бота и показ меню"

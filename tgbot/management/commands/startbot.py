@@ -12,55 +12,33 @@ from tgbot.models import Configuration
 from tgbot.logics.info_for_admins import send_messege_to_admins
 from loguru import logger
 from tgbot.scheduler import run_scheduler
-from tgbot.logics.constants import Constants
+from tgbot.logics.constants import Constants, Messages
 from tgbot.bot_instances import instances
 # Убедимся, что папка для логов существует
 Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
-_main_thread = None
-_test_thread = None
 _scheduler_thread = None
 
 def _run_main_bot():
-    """Постоянный цикл webhoock для «главного» бота."""
-    # При первом обращении берём экземпляр главного бота
+    """Устанавливает webhook для «главного» бота."""
     bot = dispatcher.get_main_bot()
-
-    # Подключаем все обработчики
-    from tgbot.handlers import commands, main_menu, moon_calc, apod, int_facts, articles, quzzes
-
-    while True:
-        try:
-            logger.info("Основной бот: запуск webhoock")
-            url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
-            bot.remove_webhook()
-            bot.set_webhook(url=url)
-            instances[Constants.MAIN_BOT_WH_I] = bot
-        except Exception as e:
-            logger.error(f"Ошибка в основном боте: {e}\n{traceback.format_exc()}")
-            send_messege_to_admins(
-                f"Ошибка в основном боте: {e}\n{traceback.format_exc()}\n\n"
-                "Основной бот будет перезапущен."
-            )
-            try:
-                bot.stop_polling()
-            except Exception:
-                pass
-            time.sleep(1)
-            logger.info("Перезапуск основного бота...")
-        else:
-            # Выходим из цикла, если polling завершился без ошибок
-            break
-
-    logger.info("Поток основного бота завершён")
+    try:
+        logger.info("Основной бот: установка webhook")
+        url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
+        bot.remove_webhook()
+        bot.set_webhook(url=url)
+        instances[Constants.MAIN_BOT_WH_I] = bot
+        logger.info("Основной бот: webhook успешно установлен")
+    except Exception:
+        logger.exception("Ошибка при установке webhook у основного бота")
 
 def _run_test_bot():
-    """Постоянный цикл polling для «тестового» бота (только если test_mode=True)."""
+    """Устанавливает webhook и регистрирует заглушки для тестового бота (только если test_mode=True)."""
     test_bot = dispatcher.get_test_bot()
     if test_bot is None:
-        logger.warning("Тестовый бот не проинициализирован, завершаем пуллинг тестового бота.")
+        logger.warning("Тестовый бот не проинициализирован — пропускаем запуск.")
         return
 
     def _register_test_handlers():
@@ -72,7 +50,7 @@ def _run_test_bot():
                 return
             test_bot.reply_to(
                 message,
-                "⚠️ *Технические работы*",
+                text=Messages.IN_TEST_MODE_MESSAGE,
                 parse_mode="Markdown"
             )
 
@@ -84,50 +62,39 @@ def _run_test_bot():
                 return
             test_bot.answer_callback_query(
                 callback_query_id=call.id,
-                text="⚠️ Технические работы",
+                text=Messages.IN_TEST_MODE_MESSAGE,
                 show_alert=False
             )
             test_bot.send_message(
                 call.message.chat.id,
-                "⚠️ *Технические работы*",
+                Messages.IN_TEST_MODE_MESSAGE,
                 parse_mode="Markdown"
             )
 
-    while True:
-        try:
-            if Configuration.get_solo().test_mode:
-                logger.info("Тестовый бот: запуск polling")
-                _register_test_handlers()
-                url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
-                test_bot.remove_webhook()
-                test_bot.set_webhook(url=url)
-                instances[Constants.TEST_BOT_WH_I] = test_bot
-            else:
-                time.sleep(1)
-        except Exception as e:
-            logger.error(f"Ошибка в тестовом боте: {e}\n{traceback.format_exc()}")
-            try:
-                test_bot.stop_polling()
-            except Exception:
-                pass
-            time.sleep(1)
-            logger.info("Перезапуск тестового бота...")
-        else:
-            break
+    # Если тестовый режим выключен — ничего не делаем
+    if not Configuration.get_solo().test_mode:
+        logger.info("Тестовый бот: test_mode=False — установка webhook не требуется.")
+        return
 
-    logger.info("Поток тестового бота завершён")
+    try:
+        logger.info("Тестовый бот: регистрация обработчиков и установка webhook")
+        _register_test_handlers()
+        url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
+        test_bot.remove_webhook()
+        test_bot.set_webhook(url=url)
+        instances[Constants.TEST_BOT_WH_I] = test_bot
+        logger.info("Тестовый бот: обработчики зарегистрированы, webhook установлен")
+    except Exception:
+        logger.exception("Ошибка при запуске тестового бота")
+
 
 
 def start_bots():
     """Запускает два фоновых потока: один для основного бота, другой — для тестового."""
-    global _main_thread, _test_thread
-
     logger.info("Запуск потоков ботов")
-    _main_thread = threading.Thread(target=_run_main_bot, daemon=True)
-    _test_thread = threading.Thread(target=_run_test_bot, daemon=True)
+    _run_main_bot()
+    _run_test_bot()
     _scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-    _main_thread.start()
-    _test_thread.start()
     _scheduler_thread.start()
 
 class Command(BaseCommand):
@@ -135,12 +102,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_bots()
-
-        # Блокируем основной процесс, пока потоки работают
-        global _main_thread, _test_thread
-        if _main_thread:
-            _main_thread.join()
-        if _test_thread:
-            _test_thread.join()
         if _scheduler_thread:
             _scheduler_thread.join()
