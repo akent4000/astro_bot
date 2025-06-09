@@ -185,7 +185,12 @@ async def application(scope, receive, send):
         while True:
             message = await receive()
             if message['type'] == 'lifespan.startup':
-                # Django is fully initialized now
+                if cache.add("redis_cache_flushed", True, timeout=10):
+                    logger.info("PID %s: сбрасываю Redis-кэш", os.getpid())
+                    cache.clear()
+                    logger.info("PID %s: Redis-кэш сброшен", os.getpid())
+                else:
+                    logger.info("PID %s: кэш уже сбросил другой воркер", os.getpid())
                 threading.Thread(target=start_bots, daemon=True).start()
                 await send({'type': 'lifespan.startup.complete'})
             elif message['type'] == 'lifespan.shutdown':
