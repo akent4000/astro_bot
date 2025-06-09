@@ -17,11 +17,58 @@ from tgbot.bot_instances import instances
 from tgbot.scheduler import run_scheduler
 from tgbot.models import Configuration
 from tgbot.logics.constants import Constants, Messages
+from telebot.apihelper import ApiTelegramException
+import time
 
 # И создаём папку под логи
 Path("logs").mkdir(parents=True, exist_ok=True)
 logger.add("logs/asgi.log", rotation="10 MB", level="INFO")
 
+
+
+def safe_set_webhook_once(bot, url, flag_key="telegram_webhook_set", ttl=24*3600):
+    # Шаг 1: пытаемся «забронировать» установку
+    got_lock = cache.add(flag_key, True, ttl)
+    if not got_lock:
+        logger.info("Webhook уже где-то установлен, пропускаем set_webhook")
+        return False
+
+    # Шаг 2: успокоившись после распределённой блокировки,
+    # проверим, не поставил ли кто-то уже webhook?
+    # (используем getWebhookInfo для этого)
+    try:
+        info = bot.get_webhook_info()
+        if info.url == url and not info.has_custom_certificate:
+            logger.info("Webhook уже стоит правильно, шаг 2 — пропускаем")
+            return True
+    except Exception:
+        # не смертельно — попробуем всё равно заново
+        pass
+
+    # Шаг 3: собственно пытаемся поставить webhook с учётом 429
+    max_retries = 3
+    for attempt in range(1, max_retries + 1):
+        try:
+            bot.remove_webhook()
+            bot.set_webhook(url=url)
+            logger.info("Webhook установлен на попытке %s/%s", attempt, max_retries)
+            return True
+        except ApiTelegramException as e:
+            params = getattr(e, "result_json", {}).get("parameters", {})
+            retry_after = params.get("retry_after", 1)
+            if e.error_code == 429:
+                logger.warning(
+                    "Rate limit, retry after %s sec (attempt %s/%s)",
+                    retry_after, attempt, max_retries
+                )
+                time.sleep(retry_after)
+                continue
+            else:
+                logger.exception("Неожиданная ошибка при установке webhook: %s", e)
+                break
+
+    logger.error("Не удалось установить webhook после %s попыток", max_retries)
+    return False
 
 def _run_main_bot():
     bot = dispatcher.get_main_bot()
@@ -35,17 +82,11 @@ def _run_main_bot():
     import tgbot.handlers.quzzes
 
     url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
-    if cache.add("telegram_webhook_set", True, timeout=24*3600):
-        try:
-            logger.info("Основной бот: установка webhook (только в одном воркере)")
-            bot.remove_webhook()
-            bot.set_webhook(url=url)
-            instances[Constants.MAIN_BOT_WH_I] = bot
-            logger.info("Основной бот: webhook успешно установлен")
-        except Exception:
-            logger.exception("Ошибка при установке webhook у основного бота")
+
+    if safe_set_webhook_once(bot, url):
+        instances[Constants.MAIN_BOT_WH_I] = bot
     else:
-        logger.info("Основной бот: webhook уже установлен другим воркером — пропускаем")
+        logger.error("Основной бот: webhook не установлен")
 
 
 def _run_test_bot():
