@@ -9,7 +9,8 @@ import time
 from tgbot.models import *
 from tgbot.managers.ssh_manager import SSHAccessManager, sync_keys
 import threading
-
+from django.core.cache import cache
+import time
 from pathlib import Path
 from loguru import logger
 
@@ -181,16 +182,9 @@ def configuration_post_save(sender, instance, created, **kwargs):
     old = getattr(instance, '_old_test_mode', None)
     new = instance.test_mode
 
-    # если тестовый режим не менялся — выходим
-    if not (created or (old is not None and old != new)):
-        return
-
-    # откладываем рестарт до конца транзакции и отдачи ответа
-    def _deferred():
-        # запускаем в отдельном потоке, чтобы не блокировать процесс Django
-        threading.Thread(target=_swap_bots, daemon=True).start()
-
-    transaction.on_commit(_deferred)
+    if created or (old is not None and old != new):
+        # вместо spawn-а одного потока, просто обновляем метку
+        cache.set("tgbot_config_changed", time.time())  
 
 @receiver(post_save, sender=TelegramBotToken)
 def tgbot_token_post_save(sender, instance, created, **kwargs):

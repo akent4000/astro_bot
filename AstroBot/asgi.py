@@ -104,18 +104,41 @@ def _run_test_bot():
     else:
         logger.info("Test bot уже инициализирован другим воркером (PID %s), пропускаем регистрацию и webhook", os.getpid())
 
+def _watch_config_changes(poll_interval: int = 5):
+    """
+    Фоновой тред: проверяет каждые poll_interval секунд,
+    поменялся ли cache["tgbot_config_changed"] – и если да, вызывает _swap_bots().
+    """
+    from django.core.cache import cache
+    from tgbot.signals import _swap_bots  # или импортируйте напрямую
+
+    last = None
+    while True:
+        time.sleep(poll_interval)
+        stamped = cache.get("tgbot_config_changed")
+        if stamped and stamped != last:
+            last = stamped
+            try:
+                _swap_bots()
+            except Exception:
+                logger.exception("Ошибка при реактивном swap_bots() из watcher'а")
+
 
 def start_bots():
     logger.info("Запуск ботов из ASGI-процесса (PID %s)", os.getpid())
     _run_main_bot()
     _run_test_bot()
 
-    # И только один воркер запустит scheduler
+    # Scheduler — только один воркер
     if cache.add("tgbot_scheduler_started", True, timeout=24*3600):
         threading.Thread(target=run_scheduler, daemon=True).start()
         logger.info("Scheduler запущен (PID %s)", os.getpid())
     else:
-        logger.info("Scheduler уже запущен другим воркером (PID %s)", os.getpid())
+        logger.info("Scheduler уже запущен другим воркером")
+
+    # Watcher — **каждый** воркер
+    threading.Thread(target=_watch_config_changes, daemon=True).start()
+    logger.info("Запущен watcher конфигурации (PID %s)", os.getpid())
 
 
 # 4) Запускаем ботов уже в правильно инициализированном контексте
