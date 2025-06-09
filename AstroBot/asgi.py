@@ -119,7 +119,9 @@ def _watch_config_changes(poll_interval: int = 5):
         if stamped and stamped != last:
             last = stamped
             try:
-                _swap_bots()
+                from tgbot.dispatcher import get_main_bot, get_test_bot
+                get_main_bot(True)
+                get_test_bot(True)
             except Exception:
                 logger.exception("Ошибка при реактивном swap_bots() из watcher'а")
 
