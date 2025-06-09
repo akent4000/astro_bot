@@ -5,8 +5,6 @@ from telebot import TeleBot
 from telebot.types import Update
 from telebot.apihelper import ApiException
 
-from tgbot.user_helper import sync_user_data
-
 from loguru import logger
 import time
 import threading
@@ -133,6 +131,7 @@ class SyncBot(TeleBot):
 
             # 2) Синхронизация данных пользователя
             try:
+                from tgbot.user_helper import sync_user_data
                 data = sync_user_data(message_or_callback)
             except Exception as e:
                 logger.exception("Ошибка sync_user_data для update %r: %s", update, e)

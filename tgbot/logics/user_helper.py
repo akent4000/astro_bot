@@ -21,9 +21,11 @@ logger.add(str(log_filename), rotation="10 MB", level="INFO")
 
 def get_user_from_call(call: CallbackQuery) -> TelegramUser | None:
     """Извлекает пользователя по chat_id из сообщения callback."""
+    
     try:
         return TelegramUser.get_user_by_chat_id(chat_id=call.from_user.id)
     except TelegramUser.DoesNotExist:
+        bot = get_main_bot()
         logger.error(f"Пользователь {call.from_user.id} не найден")
         bot.answer_callback_query(call.id, Messages.USER_NOT_FOUND_ERROR)
         return None
