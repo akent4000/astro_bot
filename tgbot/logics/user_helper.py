@@ -53,4 +53,6 @@ def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message
         return None
     
 def get_callback_name_from_call(call: CallbackQuery):
+    logger.debug(call.data)
+    logger.debug(call.data.split("?", 1)[0])
     return call.data.split("?", 1)[0]
