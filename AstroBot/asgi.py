@@ -64,10 +64,6 @@ def _run_test_bot():
         logger.warning("Тестовый бот не проинициализирован — пропускаем.")
         return
 
-    if not Configuration.get_solo().test_mode:
-        logger.info("Test mode off — пропускаем тестовый бот.")
-        return
-
     url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
 
     # Кладём экземпляр в instances для каждого воркера

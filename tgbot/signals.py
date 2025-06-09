@@ -4,7 +4,8 @@ from decimal import Decimal
 from django.db.models.signals import *
 from django.db import transaction
 from django.dispatch import receiver
-
+from telebot.apihelper import ApiTelegramException
+import time
 from tgbot.models import *
 from tgbot.managers.ssh_manager import SSHAccessManager, sync_keys
 import threading
@@ -134,15 +135,39 @@ def configuration_pre_save(sender, instance, **kwargs):
         except Configuration.DoesNotExist:
             instance._old_test_mode = None
 
-def _restart_service():
+def _swap_bots():
     try:
-        result = subprocess.run(
-            ['systemctl', 'restart', 'uvicorn'],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-        logger.info(f"'bot' service restarted successfully. stdout:\n{result.stdout.strip()}")
+        from tgbot.dispatcher import get_main_bot, get_test_bot
+        test_mode = Configuration.get_solo().test_mode
+        main_bot_url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
+        test_bot_url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
+
+        bot = get_main_bot()
+        test_bot = get_test_bot()
+        
+        bot.remove_webhook()
+        test_bot.remove_webhook()
+
+        max_retries = 3
+        for attempt in range(1, max_retries+1):
+            try:
+                bot.remove_webhook()
+                test_bot.remove_webhook()
+                bot.set_webhook(url=main_bot_url if test_mode else test_bot_url)
+                test_bot.set_webhook(url=test_bot_url if test_mode else main_bot_url)
+
+                logger.info("Webhook установлен в воркере PID %s", os.getpid())
+                break
+            except ApiTelegramException as e:
+                if e.error_code == 429:
+                    retry_after = e.result_json.get("parameters", {}).get("retry_after", 1)
+                    logger.warning("429 retry after %s", retry_after)
+                    time.sleep(retry_after)
+                    continue
+                else:
+                    logger.exception("Ошибка set_webhook: %s", e)
+                    break
+        
     except subprocess.CalledProcessError as e:
         logger.error(
             f"Failed to restart service 'bot'. Return code: {e.returncode}. "
@@ -163,7 +188,7 @@ def configuration_post_save(sender, instance, created, **kwargs):
     # откладываем рестарт до конца транзакции и отдачи ответа
     def _deferred():
         # запускаем в отдельном потоке, чтобы не блокировать процесс Django
-        threading.Thread(target=_restart_service, daemon=True).start()
+        threading.Thread(target=_swap_bots, daemon=True).start()
 
     transaction.on_commit(_deferred)
 
@@ -171,6 +196,6 @@ def configuration_post_save(sender, instance, created, **kwargs):
 def tgbot_token_post_save(sender, instance, created, **kwargs):
     def _deferred():
         # запускаем в отдельном потоке, чтобы не блокировать процесс Django
-        threading.Thread(target=_restart_service, daemon=True).start()
+        threading.Thread(target=_swap_bots, daemon=True).start()
 
     transaction.on_commit(_deferred)
