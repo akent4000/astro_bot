@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 import threading
+from django.core.cache import cache
 
 # 1) Устанавливаем настройки Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AstroBot.settings')
@@ -33,15 +34,17 @@ def _run_main_bot():
     import tgbot.handlers.articles
     import tgbot.handlers.quzzes
 
-    try:
-        logger.info("Основной бот: установка webhook")
-        url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
-        bot.remove_webhook()
-        bot.set_webhook(url=url)
-        instances[Constants.MAIN_BOT_WH_I] = bot
-        logger.info("Основной бот: webhook успешно установлен")
-    except Exception:
-        logger.exception("Ошибка при установке webhook у основного бота")
+    if cache.add("telegram_webhook_set", True, timeout=24*3600):
+        try:
+            logger.info("Основной бот: установка webhook (только в одном воркере)")
+            bot.remove_webhook()
+            bot.set_webhook(url=url)
+            instances[Constants.MAIN_BOT_WH_I] = bot
+            logger.info("Основной бот: webhook успешно установлен")
+        except Exception:
+            logger.exception("Ошибка при установке webhook у основного бота")
+    else:
+        logger.info("Основной бот: webhook уже установлен другим воркером — пропускаем")
 
 
 def _run_test_bot():
