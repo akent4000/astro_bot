@@ -63,17 +63,25 @@ def _run_test_bot():
     if not test_bot:
         logger.warning("Тестовый бот не проинициализирован — пропускаем.")
         return
+
     if not Configuration.get_solo().test_mode:
         logger.info("Test mode off — пропускаем тестовый бот.")
         return
 
-    def _register_test_handlers():
+    url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
+
+    # Кладём экземпляр в instances для каждого воркера
+    instances[Constants.TEST_BOT_WH_I] = test_bot
+
+    # Только один воркер дальше будет регистрировать хэндлеры + ставить webhook
+    if cache.add("telegram_test_bot_initialized", True, timeout=24*3600):
+        # 1) Регистрация «заглушек»
         @test_bot.message_handler(func=lambda m: True)
-        def _m(_msg):
+        def _m(msg):
             from tgbot.user_helper import is_group_chat
-            if is_group_chat(_msg):
+            if is_group_chat(msg):
                 return
-            test_bot.reply_to(_msg, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
+            test_bot.reply_to(msg, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
 
         @test_bot.callback_query_handler(func=lambda c: True)
         def _c(c):
@@ -83,23 +91,36 @@ def _run_test_bot():
             test_bot.answer_callback_query(c.id, text=Messages.IN_TEST_MODE_MESSAGE)
             test_bot.send_message(c.message.chat.id, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
 
-    try:
-        logger.info("Тестовый бот: регистрация заглушек и установка webhook")
-        _register_test_handlers()
-        url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
-        test_bot.remove_webhook()
-        test_bot.set_webhook(url=url)
-        instances[Constants.TEST_BOT_WH_I] = test_bot
-        logger.info("Тестовый бот: webhook установлен")
-    except Exception:
-        logger.exception("Ошибка при установке webhook у тестового бота")
+        # 2) Установка webhook с учётом 429
+        for attempt in range(1, 4):
+            try:
+                test_bot.remove_webhook()
+                test_bot.set_webhook(url=url)
+                logger.info("Test webhook установлен (PID %s)", os.getpid())
+                break
+            except ApiTelegramException as e:
+                if e.error_code == 429:
+                    retry_after = e.result_json.get("parameters", {}).get("retry_after", 1)
+                    logger.warning("Test webhook rate limit, retry after %s sec (attempt %s)", retry_after, attempt)
+                    time.sleep(retry_after)
+                    continue
+                logger.exception("Ошибка установки webhook тестового бота: %s", e)
+                break
+    else:
+        logger.info("Test bot уже инициализирован другим воркером (PID %s), пропускаем регистрацию и webhook", os.getpid())
 
 
 def start_bots():
-    logger.info("Запуск ботов из ASGI-процесса")
+    logger.info("Запуск ботов из ASGI-процесса (PID %s)", os.getpid())
     _run_main_bot()
     _run_test_bot()
-    threading.Thread(target=run_scheduler, daemon=True).start()
+
+    # И только один воркер запустит scheduler
+    if cache.add("tgbot_scheduler_started", True, timeout=24*3600):
+        threading.Thread(target=run_scheduler, daemon=True).start()
+        logger.info("Scheduler запущен (PID %s)", os.getpid())
+    else:
+        logger.info("Scheduler уже запущен другим воркером (PID %s)", os.getpid())
 
 
 # 4) Запускаем ботов уже в правильно инициализированном контексте

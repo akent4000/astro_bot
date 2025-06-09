@@ -137,7 +137,7 @@ def configuration_pre_save(sender, instance, **kwargs):
 def _restart_service():
     try:
         result = subprocess.run(
-            ['systemctl', 'restart', 'bot'],
+            ['systemctl', 'restart', 'uvicorn'],
             check=True,
             capture_output=True,
             text=True
