@@ -3,7 +3,6 @@ import urllib.parse
 from telebot.types import CallbackQuery, MessageEntity
 
 from tgbot.dispatcher import get_main_bot
-bot = get_main_bot()
 from tgbot.models import *
 from tgbot.logics.constants import *
 from tgbot.logics.messages import *
@@ -36,6 +35,7 @@ def extract_query_params(call: CallbackQuery, show_warning: bool=True) -> dict:
         return urllib.parse.parse_qs(query_string)
     except IndexError:
         if show_warning:
+            bot = get_main_bot()
             bot.answer_callback_query(call.id, Messages.MISSING_PARAMETERS_ERROR)
         return {}
 
@@ -44,12 +44,14 @@ def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message
     param_list = params.get(key)
     if not param_list:
         if error_message:
+            bot = get_main_bot()
             bot.answer_callback_query(call.id, error_message)
         return None
     try:
         return int(param_list[0])
     except ValueError:
         if error_message:
+            bot = get_main_bot()
             bot.answer_callback_query(call.id, Messages.INCORRECT_VALUE_ERROR.format(key=key))
         return None
 
