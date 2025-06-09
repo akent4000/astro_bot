@@ -142,7 +142,6 @@ def _watch_config_changes(poll_interval: int = 5):
     поменялся ли cache["tgbot_config_changed"] – и если да, вызывает _swap_bots().
     """
     from django.core.cache import cache
-    from tgbot.signals import _reload_bots  # или импортируйте напрямую
 
     last = None
     while True:
