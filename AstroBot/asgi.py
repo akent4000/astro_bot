@@ -17,58 +17,11 @@ from tgbot.bot_instances import instances
 from tgbot.scheduler import run_scheduler
 from tgbot.models import Configuration
 from tgbot.logics.constants import Constants, Messages
-from telebot.apihelper import ApiTelegramException
-import time
 
 # И создаём папку под логи
 Path("logs").mkdir(parents=True, exist_ok=True)
 logger.add("logs/asgi.log", rotation="10 MB", level="INFO")
 
-
-
-def safe_set_webhook_once(bot, url, flag_key="telegram_webhook_set", ttl=24*3600):
-    # Шаг 1: пытаемся «забронировать» установку
-    got_lock = cache.add(flag_key, True, ttl)
-    if not got_lock:
-        logger.info("Webhook уже где-то установлен, пропускаем set_webhook")
-        return False
-
-    # Шаг 2: успокоившись после распределённой блокировки,
-    # проверим, не поставил ли кто-то уже webhook?
-    # (используем getWebhookInfo для этого)
-    try:
-        info = bot.get_webhook_info()
-        if info.url == url and not info.has_custom_certificate:
-            logger.info("Webhook уже стоит правильно, шаг 2 — пропускаем")
-            return True
-    except Exception:
-        # не смертельно — попробуем всё равно заново
-        pass
-
-    # Шаг 3: собственно пытаемся поставить webhook с учётом 429
-    max_retries = 3
-    for attempt in range(1, max_retries + 1):
-        try:
-            bot.remove_webhook()
-            bot.set_webhook(url=url)
-            logger.info("Webhook установлен на попытке %s/%s", attempt, max_retries)
-            return True
-        except ApiTelegramException as e:
-            params = getattr(e, "result_json", {}).get("parameters", {})
-            retry_after = params.get("retry_after", 1)
-            if e.error_code == 429:
-                logger.warning(
-                    "Rate limit, retry after %s sec (attempt %s/%s)",
-                    retry_after, attempt, max_retries
-                )
-                time.sleep(retry_after)
-                continue
-            else:
-                logger.exception("Неожиданная ошибка при установке webhook: %s", e)
-                break
-
-    logger.error("Не удалось установить webhook после %s попыток", max_retries)
-    return False
 
 def _run_main_bot():
     bot = dispatcher.get_main_bot()
@@ -81,12 +34,15 @@ def _run_main_bot():
     import tgbot.handlers.articles
     import tgbot.handlers.quzzes
 
-    url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
-
-    if safe_set_webhook_once(bot, url):
+    try:
+        logger.info("Основной бот: установка webhook")
+        url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
+        bot.remove_webhook()
+        bot.set_webhook(url=url)
         instances[Constants.MAIN_BOT_WH_I] = bot
-    else:
-        logger.error("Основной бот: webhook не установлен")
+        logger.info("Основной бот: webhook успешно установлен")
+    except Exception:
+        logger.exception("Ошибка при установке webhook у основного бота")
 
 
 def _run_test_bot():
@@ -135,22 +91,20 @@ def start_bots():
 
 # 4) Запускаем ботов уже в правильно инициализированном контексте
 async def application(scope, receive, send):
-    """
-    ASGI router that:
-      – on lifespan.startup → kicks off start_bots()
-      – on lifespan.shutdown → acks and quits
-      – otherwise → delegates to Django’s HTTP/Websocket handlers
-    """
     if scope['type'] == 'lifespan':
         while True:
             message = await receive()
             if message['type'] == 'lifespan.startup':
-                # Django is fully initialized now
-                threading.Thread(target=start_bots, daemon=True).start()
+                # Попытаемся установить флаг — только первый воркер увидит True
+                if cache.add("tgbot_bots_started", True, timeout=24*3600):
+                    # первый успешно "захватывает" запуск
+                    threading.Thread(target=start_bots, daemon=True).start()
+                    logger.info("start_bots() запущен первым воркером")
+                else:
+                    logger.info("start_bots() уже был запущен другим воркером — пропускаем")
                 await send({'type': 'lifespan.startup.complete'})
             elif message['type'] == 'lifespan.shutdown':
                 await send({'type': 'lifespan.shutdown.complete'})
                 return
     else:
-        # HTTP or WebSocket → hand off to Django
         await django_app(scope, receive, send)
