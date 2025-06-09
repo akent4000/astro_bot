@@ -148,6 +148,12 @@ def _swap_bots():
         bot.remove_webhook()
         test_bot.remove_webhook()
 
+        bot = None
+        test_bot = None
+
+        bot = get_main_bot()
+        test_bot = get_test_bot()
+
         max_retries = 3
         for attempt in range(1, max_retries+1):
             try:
