@@ -2,30 +2,29 @@ import os
 from pathlib import Path
 import threading
 
-# 1) Задаём переменную окружения до любых обращений к Django
+# 1) Устанавливаем настройки Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AstroBot.settings')
 
-# 2) Импортируем и инициализируем Django
+# 2) Инициалищируем Django — сразу вызываем ASGI-приложение
 from django.core.asgi import get_asgi_application
+application = get_asgi_application()
 
-# 3) Теперь безопасно работать с ORM
+# 3) Теперь можно безопасно импортировать всё, что работает с ORM и AppConfig
 from loguru import logger
-import threading
 from tgbot import dispatcher
 from tgbot.bot_instances import instances
 from tgbot.scheduler import run_scheduler
 from tgbot.models import Configuration
 from tgbot.logics.constants import Constants, Messages
 
-# Убедимся, что папка для логов существует
+# И создаём папку под логи
 Path("logs").mkdir(parents=True, exist_ok=True)
 logger.add("logs/asgi.log", rotation="10 MB", level="INFO")
 
 
 def _run_main_bot():
-    """Инициализируем и вешаем webhook на главный бот."""
     bot = dispatcher.get_main_bot()
-    # Импортируем модули с декораторами (они уже регистрируют хэндлеры на dispatcher)
+    # Импорт хэндлеров только после того, как бот создан
     import tgbot.handlers.commands
     import tgbot.handlers.main_menu
     import tgbot.handlers.moon_calc
@@ -46,17 +45,14 @@ def _run_main_bot():
 
 
 def _run_test_bot():
-    """Инициализируем и вешаем webhook на тестовый бот (если test_mode=True)."""
     test_bot = dispatcher.get_test_bot()
     if not test_bot:
         logger.warning("Тестовый бот не проинициализирован — пропускаем.")
         return
-
     if not Configuration.get_solo().test_mode:
         logger.info("Test mode off — пропускаем тестовый бот.")
         return
 
-    # Регистрируем «заглушки» для тестового бота
     def _register_test_handlers():
         @test_bot.message_handler(func=lambda m: True)
         def _m(_msg):
@@ -86,18 +82,11 @@ def _run_test_bot():
 
 
 def start_bots():
-    """Запускаем webhooks и планировщик в фоновых потоках одного процесса."""
     logger.info("Запуск ботов из ASGI-процесса")
     _run_main_bot()
     _run_test_bot()
+    threading.Thread(target=run_scheduler, daemon=True).start()
 
-    sched_thread = threading.Thread(target=run_scheduler, daemon=True)
-    sched_thread.start()
-    # Чтобы main thread не завершился, можно дождаться scheduler или ждать бесконечно:
-    # sched_thread.join()
-    # или
-    # threading.Event().wait()
 
-# 4) Запускаем ботов при импорте asgi.py, но уже в полностью инициализированном Django
+# 4) Запускаем ботов уже в правильно инициализированном контексте
 threading.Thread(target=start_bots, daemon=True).start()
-application = get_asgi_application()
