@@ -69,24 +69,23 @@ def _run_test_bot():
     # Кладём экземпляр в instances для каждого воркера
     instances[Constants.TEST_BOT_WH_I] = test_bot
 
+    @test_bot.message_handler(func=lambda m: True)
+    def _m(msg):
+        from tgbot.user_helper import is_group_chat
+        if is_group_chat(msg):
+            return
+        test_bot.reply_to(msg, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
+
+    @test_bot.callback_query_handler(func=lambda c: True)
+    def _c(c):
+        from tgbot.user_helper import is_group_chat
+        if is_group_chat(c.message):
+            return
+        test_bot.answer_callback_query(c.id, text=Messages.IN_TEST_MODE_MESSAGE)
+        test_bot.send_message(c.message.chat.id, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
+
     # Только один воркер дальше будет регистрировать хэндлеры + ставить webhook
     if cache.add("telegram_test_bot_initialized", True, timeout=24*3600):
-        # 1) Регистрация «заглушек»
-        @test_bot.message_handler(func=lambda m: True)
-        def _m(msg):
-            from tgbot.user_helper import is_group_chat
-            if is_group_chat(msg):
-                return
-            test_bot.reply_to(msg, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
-
-        @test_bot.callback_query_handler(func=lambda c: True)
-        def _c(c):
-            from tgbot.user_helper import is_group_chat
-            if is_group_chat(c.message):
-                return
-            test_bot.answer_callback_query(c.id, text=Messages.IN_TEST_MODE_MESSAGE)
-            test_bot.send_message(c.message.chat.id, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
-
         # 2) Установка webhook с учётом 429
         for attempt in range(1, 4):
             try:
