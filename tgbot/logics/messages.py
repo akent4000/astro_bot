@@ -7,7 +7,6 @@ from typing import Optional, Iterable, Union
 import requests
 
 from tgbot.dispatcher import get_main_bot
-bot = get_main_bot()
 
 from tgbot.logics.apod_api import APODClient, APODClientError
 from tgbot.logics.keyboards import *
@@ -46,6 +45,7 @@ class SendMessages:
         send_func: функция без аргументов, возвращает объект Message при отправке
         edit_func: функция(chat_id, message_id) — возвращает объект Message при редактировании
         """
+        bot = get_main_bot()
         chat_id = user.chat_id
         logger.debug(f"_update_or_replace_last: user={user}, forced_delete={forced_delete}")
 
@@ -123,6 +123,7 @@ class SendMessages:
             text: текст для send_message / edit_message_text
             **kwargs: 'reply_markup', 'parse_mode' и т.д.
         """
+        bot = get_main_bot()
         logger.debug(f"update_or_replace_last_message: user={user}, forced_delete={forced_delete}, text={text}")
         send_fn = lambda: bot.send_message(chat_id=user.chat_id, text=text, **kwargs)
         edit_fn = lambda chat_id, message_id: bot.edit_message_text(
@@ -146,6 +147,7 @@ class SendMessages:
             caption: подпись для фото
             **kwargs: 'reply_markup', 'parse_mode' и т.д.
         """
+        bot = get_main_bot()
         logger.debug(f"update_or_replace_last_photo: user={user}, forced_delete={forced_delete}, caption={caption}")
         send_fn = lambda: bot.send_photo(
             chat_id=user.chat_id, photo=photo, caption=caption, **kwargs
@@ -257,6 +259,8 @@ class SendMessages:
             - Если нет, скачиваем новый буфер и передаём его.
             После отправки (если file_id был пуст) сохраняем новый telegram_media_id.
             """
+            bot = get_main_bot()
+
             chat_id = user.chat_id
             logger.debug(f"Apod.send_apod: user={user}")
 
