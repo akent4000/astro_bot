@@ -14,11 +14,10 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
-def bot():
-    return get_main_bot()
+bot = get_main_bot()
 
 # Обработчик для главного меню
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MENU)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MENU)
 def main_menu(call: CallbackQuery):
     logger.info("Received MENU callback: {}", call.data)
     user = get_user_from_call(call)
@@ -47,7 +46,7 @@ def main_menu(call: CallbackQuery):
     SendMessages.MainMenu.menu(user)
 
 # Обработчик для принудительного удаления сессии и показа меню
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MENU_FORCED_DELETE)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MENU_FORCED_DELETE)
 def main_menu_forced_delete(call: CallbackQuery):
     logger.info("Received MENU_FORCED_DELETE callback: {}", call.data)
     user = get_user_from_call(call)

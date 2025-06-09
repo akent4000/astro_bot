@@ -15,11 +15,10 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
-def bot():
-    return get_main_bot()
+bot = get_main_bot()
 
 # Обработчик для MOON_CALC (главное меню MoonCalc)
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC)
 def handle_moon_calc(call: CallbackQuery):
     logger.info("Received MOON_CALC callback: {}", call.data)
     user = get_user_from_call(call)
@@ -30,7 +29,7 @@ def handle_moon_calc(call: CallbackQuery):
     SendMessages.MoonCalc.menu(user)
 
 # Обработчик для MOON_CALC_TODAY
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC_TODAY)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC_TODAY)
 def handle_moon_calc_today(call: CallbackQuery):
     logger.info("Received MOON_CALC_TODAY callback: {}", call.data)
     user = get_user_from_call(call)
@@ -41,7 +40,7 @@ def handle_moon_calc_today(call: CallbackQuery):
     SendMessages.MoonCalc.today(user)
 
 # Обработчик для MOON_CALC_ENTER_DATE
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC_ENTER_DATE)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.MOON_CALC_ENTER_DATE)
 def handle_moon_calc_enter_date(call: CallbackQuery):
     logger.info("Received MOON_CALC_ENTER_DATE callback: {}", call.data)
     user = get_user_from_call(call)

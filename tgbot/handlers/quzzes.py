@@ -14,11 +14,10 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
-def bot():
-    return get_main_bot()
+bot = get_main_bot()
 
 # --- Обработчики QUIZZES ---
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES)
 def handle_quizzes(call: CallbackQuery):
     logger.info("Received QUIZZES callback: {}", call.data)
     user = get_user_from_call(call)
@@ -28,7 +27,7 @@ def handle_quizzes(call: CallbackQuery):
     logger.debug("Sending topic list to user {}", user.id)
     SendMessages.Quizzes.choose_topic(user)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_TOPIC)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_TOPIC)
 def handle_quizzes_topic(call: CallbackQuery):
     logger.info("Received QUIZZES_TOPIC callback: {}", call.data)
     user = get_user_from_call(call)
@@ -51,7 +50,7 @@ def handle_quizzes_topic(call: CallbackQuery):
     logger.debug("Sending level choices for topic {} to user {}", topic.id, user.id)
     SendMessages.Quizzes.choose_level(user, topic)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_LEVEL)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_LEVEL)
 def handle_quizzes_level(call: CallbackQuery):
     logger.info("Received QUIZZES_LEVEL callback: {}", call.data)
     user = get_user_from_call(call)
@@ -88,7 +87,7 @@ def handle_quizzes_level(call: CallbackQuery):
     logger.debug("Sending quiz choices for topic {} level {} to user {}", topic.id, level.id, user.id)
     SendMessages.Quizzes.choose_quiz(user, topic, level)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZ)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZ)
 def handle_quizzes_quiz(call: CallbackQuery):
     logger.info("Received QUIZZES_QUIZ callback: {}", call.data)
     user = get_user_from_call(call)
@@ -117,7 +116,7 @@ def handle_quizzes_quiz(call: CallbackQuery):
     logger.info("Created new session {} for user {} quiz {}", session.id, user.id, quiz.id)
     SendMessages.Quizzes.question(user, question, session)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES_QUIZ_QUESTION_CHOISE)
 def handle_quizzes_question_choice(call: CallbackQuery):
     logger.info("Received QUIZZES_QUIZ_QUESTION_CHOISE callback: {}", call.data)
     user = get_user_from_call(call)

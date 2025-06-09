@@ -24,6 +24,13 @@ _scheduler_thread = None
 def _run_main_bot():
     """Устанавливает webhook для «главного» бота."""
     bot = dispatcher.get_main_bot()
+    import tgbot.handlers.commands
+    import tgbot.handlers.main_menu
+    import tgbot.handlers.moon_calc
+    import tgbot.handlers.apod
+    import tgbot.handlers.int_facts
+    import tgbot.handlers.articles
+    import tgbot.handlers.quzzes
     try:
         logger.info("Основной бот: установка webhook")
         url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)

@@ -11,6 +11,8 @@ from tgbot.logics.messages import SendMessages
 from pathlib import Path
 from loguru import logger
 
+
+
 # Убедимся, что папка logs существует
 Path("logs").mkdir(parents=True, exist_ok=True)
 
@@ -24,10 +26,9 @@ logger.add(
     diagnose=True,
 )
 
-def bot():
-    return get_main_bot()
+bot = get_main_bot()
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.APOD)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.APOD)
 def handle_apod(call: CallbackQuery):
     logger.info("Received APOD callback: {}", call.data)
     user = get_user_from_call(call)

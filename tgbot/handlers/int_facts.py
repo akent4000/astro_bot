@@ -16,10 +16,10 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
-def bot():
-    return get_main_bot()
+bot = get_main_bot()
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS)
+
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS)
 def handle_int_facts(call: CallbackQuery):
     logger.info("Received INT_FACTS callback: {}", call.data)
     user = get_user_from_call(call)
@@ -29,7 +29,7 @@ def handle_int_facts(call: CallbackQuery):
     logger.debug("Sending IntFacts menu to user {}", user.id)
     SendMessages.IntFacts.menu(user)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_TODAY)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_TODAY)
 def handle_int_facts_today(call: CallbackQuery):
     logger.info("Received INT_FACTS_TODAY callback: {}", call.data)
     user = get_user_from_call(call)
@@ -39,7 +39,7 @@ def handle_int_facts_today(call: CallbackQuery):
     logger.debug("Sending today's fact to user {}", user.id)
     SendMessages.IntFacts.today(user)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_SUB)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_SUB)
 def handle_int_facts_sub(call: CallbackQuery):
     logger.info("Received INT_FACTS_SUB callback: {}", call.data)
     user = get_user_from_call(call)
@@ -49,7 +49,7 @@ def handle_int_facts_sub(call: CallbackQuery):
     logger.debug("Prompting user {} to choose subscription time or default", user.id)
     SendMessages.IntFacts.choose_time_or_default(user)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_UNSUB)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_UNSUB)
 def handle_int_facts_unsub(call: CallbackQuery):
     logger.info("Received INT_FACTS_UNSUB callback: {}", call.data)
     user = get_user_from_call(call)
@@ -65,7 +65,7 @@ def handle_int_facts_unsub(call: CallbackQuery):
         logger.debug("No DailySubscription entries found for user {} to delete", user.id)
     SendMessages.IntFacts.unsub(user)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_DEFAULT_TIME)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_DEFAULT_TIME)
 def handle_int_facts_default_time(call: CallbackQuery):
     logger.info("Received INT_FACTS_DEFAULT_TIME callback: {}", call.data)
     user = get_user_from_call(call)
@@ -75,7 +75,7 @@ def handle_int_facts_default_time(call: CallbackQuery):
     logger.debug("Using default subscription time for user {}", user.id)
     process_int_facts_time_sub(ButtonNames.INT_FACTS_DEFAULT_TIME, user)
 
-bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_ENTER_TIME)
+@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.INT_FACTS_ENTER_TIME)
 def handle_int_facts_enter_time(call: CallbackQuery):
     logger.info("Received INT_FACTS_ENTER_TIME callback: {}", call.data)
     user = get_user_from_call(call)
