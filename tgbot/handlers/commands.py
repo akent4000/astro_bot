@@ -15,11 +15,10 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG", backtrace=True, diagnose=True)
 
-@property
 def bot():
     return get_main_bot()
 
-@bot.message_handler(commands=[Commands.START])
+bot().message_handler(commands=[Commands.START])
 def handle_start(message: Message):
     logger.info("Received START command from chat_id={}", message.chat.id)
     logger.debug("Message details: chat: {}, from_user: {}, text: {}",

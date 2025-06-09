@@ -19,12 +19,11 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
 
-@property
 def bot():
     return get_main_bot()
 
 # Обработчик для APOD (Astronomy Picture of the Day)
-@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.APOD)
+bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.APOD)
 def handle_apod(call: CallbackQuery):
     logger.info("Received APOD callback: {}", call.data)
     user = get_user_from_call(call)
@@ -50,7 +49,7 @@ def handle_apod(call: CallbackQuery):
         SendMessages.APOD.error_general(user)
 
 # Обработчик для ARTICLES (главное меню статей)
-@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.ARTICLES)
+bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.ARTICLES)
 def handle_articles(call: CallbackQuery):
     logger.info("Received ARTICLES callback: {}", call.data)
     user = get_user_from_call(call)
@@ -61,7 +60,7 @@ def handle_articles(call: CallbackQuery):
     SendMessages.Articles.choose_section(user)
 
 # Обработчик для ARTICLES_SECTION (с параметром section_id)
-@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.ARTICLES_SECTION)
+bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.ARTICLES_SECTION)
 def handle_articles_section(call: CallbackQuery):
     logger.info("Received ARTICLES_SECTION callback: {}", call.data)
     user = get_user_from_call(call)
@@ -87,7 +86,7 @@ def handle_articles_section(call: CallbackQuery):
     SendMessages.Articles.choose_subsection(user, section)
 
 # Обработчик для ARTICLES_SUBSECTION (с параметром subsection_id)
-@bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.ARTICLES_SUBSECTION)
+bot().callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.ARTICLES_SUBSECTION)
 def handle_articles_subsection(call: CallbackQuery):
     logger.info("Received ARTICLES_SUBSECTION callback: {}", call.data)
     user = get_user_from_call(call)
