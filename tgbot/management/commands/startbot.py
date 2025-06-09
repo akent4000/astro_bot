@@ -98,6 +98,7 @@ def _run_test_bot():
 
 def start_bots():
     """Запускает два фоновых потока: один для основного бота, другой — для тестового."""
+    global _scheduler_thread
     logger.info("Запуск потоков ботов")
     _run_main_bot()
     _run_test_bot()
@@ -109,5 +110,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         start_bots()
-        if _scheduler_thread:
-            _scheduler_thread.join()
+        threading.Event().wait()
