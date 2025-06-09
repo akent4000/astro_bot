@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from tgbot.logics.constants import Constants
 
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,7 +29,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "astro.testdomain.su"]
+ALLOWED_HOSTS = ["localhost", Constants.APP_DOMAIN]
 
 USE_I18N = True
 LANGUAGE_CODE = 'ru'
@@ -38,7 +39,7 @@ USE_TZ = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-    "https://astro.testdomain.su"
+    Constants.APP_URL
 ]
 
 STATIC_URL = '/static/'

@@ -12,7 +12,8 @@ from tgbot.models import Configuration
 from tgbot.logics.info_for_admins import send_messege_to_admins
 from loguru import logger
 from tgbot.scheduler import run_scheduler
-
+from tgbot.logics.constants import Constants
+from tgbot.bot_instances import instances
 # Убедимся, что папка для логов существует
 Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
@@ -23,7 +24,7 @@ _test_thread = None
 _scheduler_thread = None
 
 def _run_main_bot():
-    """Постоянный цикл polling для «главного» бота."""
+    """Постоянный цикл webhoock для «главного» бота."""
     # При первом обращении берём экземпляр главного бота
     bot = dispatcher.get_main_bot()
 
@@ -32,13 +33,11 @@ def _run_main_bot():
 
     while True:
         try:
-            logger.info("Основной бот: запуск polling")
-            bot.polling(
-                none_stop=True,
-                interval=0,
-                timeout=20,
-                skip_pending=True
-            )
+            logger.info("Основной бот: запуск webhoock")
+            url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
+            bot.remove_webhook()
+            bot.set_webhook(url=url)
+            instances[Constants.MAIN_BOT_WH_I] = bot
         except Exception as e:
             logger.error(f"Ошибка в основном боте: {e}\n{traceback.format_exc()}")
             send_messege_to_admins(
@@ -56,20 +55,6 @@ def _run_main_bot():
             break
 
     logger.info("Поток основного бота завершён")
-
-def _register_test_handlers(test_bot):
-    # Перехват всех обычных текстовых сообщений и «кнопок» reply-клавиатур
-    @test_bot.message_handler(func=lambda m: True)
-    def handle_all_messages(message):
-        from tgbot.user_helper import is_group_chat
-
-        if is_group_chat(message):
-            return
-        test_bot.reply_to(
-            message,
-            "⚠️ *Технические работы*",
-            parse_mode="Markdown"
-        )
 
 def _run_test_bot():
     """Постоянный цикл polling для «тестового» бота (только если test_mode=True)."""
@@ -113,12 +98,10 @@ def _run_test_bot():
             if Configuration.get_solo().test_mode:
                 logger.info("Тестовый бот: запуск polling")
                 _register_test_handlers()
-                test_bot.polling(
-                    none_stop=True,
-                    interval=0,
-                    timeout=20,
-                    skip_pending=True
-                )
+                url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
+                test_bot.remove_webhook()
+                test_bot.set_webhook(url=url)
+                instances[Constants.TEST_BOT_WH_I] = test_bot
             else:
                 time.sleep(1)
         except Exception as e:

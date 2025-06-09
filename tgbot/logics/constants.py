@@ -83,9 +83,16 @@ class ButtonNames:
 
 class Urls:
     pass
+
 class Constants:
     NASA_APOD_ENDPOINT = "https://api.nasa.gov/planetary/apod"
     ZONE_INFO = "Europe/Moscow"
+    APP_DOMAIN = "astro.testdomain.su"
+    APP_URL = f"https://{APP_DOMAIN}"
+    WEBHOOCK = "webhook"
+    BOT_WEBHOOCK_URL = f"{APP_URL}/{WEBHOOCK}/{{i}}/"
+    MAIN_BOT_WH_I = 0
+    TEST_BOT_WH_I = 1
 
 class Messages:
     MENU_MESSAGE = "🏠 Главное меню"

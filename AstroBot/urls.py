@@ -22,6 +22,6 @@ from AstroBot import settings
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico')),    
-
+    path('favicon.ico', RedirectView.as_view(url=settings.STATIC_URL + 'favicon.ico')),
+    path('', include('tgbot.urls')),  
 ]
