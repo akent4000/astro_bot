@@ -23,6 +23,7 @@ import time
 Path("logs").mkdir(parents=True, exist_ok=True)
 logger.add("logs/asgi.log", rotation="10 MB", level="INFO")
 
+_reload_lock = threading.Lock()
 
 def _run_main_bot():
     bot = dispatcher.get_main_bot()
@@ -104,13 +105,44 @@ def _run_test_bot():
     else:
         logger.info("Test bot уже инициализирован другим воркером (PID %s), пропускаем регистрацию и webhook", os.getpid())
 
+def reload_bots():
+    def _worker():
+        with _reload_lock:
+            logger.info("=== Начинаем полный перезапуск ботов (PID %s) ===", os.getpid())
+            # remove old webhooks
+            try:
+                old_main = dispatcher._main_bot
+                if old_main: old_main.remove_webhook()
+            except Exception as e:
+                logger.warning("Не удалось снять webhook у основного бота: %s", e)
+            try:
+                old_test = dispatcher._test_bot
+                if old_test: old_test.remove_webhook()
+            except Exception as e:
+                logger.warning("Не удалось снять webhook у тестового бота: %s", e)
+
+            # reset dispatcher and instances
+            dispatcher._main_bot = None
+            dispatcher._test_bot = None
+            instances.clear()
+
+            # re-run initialization
+            _run_main_bot()
+            _run_test_bot()
+
+            # restart scheduler
+            threading.Thread(target=run_scheduler, daemon=True).start()
+            logger.info("=== Перезапуск ботов завершён ===")
+
+    threading.Thread(target=_worker, daemon=True).start()
+
 def _watch_config_changes(poll_interval: int = 5):
     """
     Фоновой тред: проверяет каждые poll_interval секунд,
     поменялся ли cache["tgbot_config_changed"] – и если да, вызывает _swap_bots().
     """
     from django.core.cache import cache
-    from tgbot.signals import _swap_bots  # или импортируйте напрямую
+    from tgbot.signals import _reload_bots  # или импортируйте напрямую
 
     last = None
     while True:
@@ -119,11 +151,10 @@ def _watch_config_changes(poll_interval: int = 5):
         if stamped and stamped != last:
             last = stamped
             try:
-                from tgbot.dispatcher import get_main_bot, get_test_bot
-                get_main_bot(True)
-                get_test_bot(True)
+                reload_bots()
             except Exception:
                 logger.exception("Ошибка при реактивном swap_bots() из watcher'а")
+
 
 
 def start_bots():

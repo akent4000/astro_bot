@@ -136,46 +136,6 @@ def configuration_pre_save(sender, instance, **kwargs):
         except Configuration.DoesNotExist:
             instance._old_test_mode = None
 
-def _swap_bots():
-    try:
-        from tgbot.dispatcher import get_main_bot, get_test_bot
-        test_mode = Configuration.get_solo().test_mode
-        main_bot_url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
-        test_bot_url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
-
-        bot = get_main_bot(True)
-        test_bot = get_test_bot(True)
-        
-        bot.remove_webhook()
-        test_bot.remove_webhook()
-
-        max_retries = 3
-        for attempt in range(1, max_retries+1):
-            try:
-                bot.remove_webhook()
-                test_bot.remove_webhook()
-                bot.set_webhook(url=main_bot_url if test_mode else test_bot_url)
-                test_bot.set_webhook(url=test_bot_url if test_mode else main_bot_url)
-
-                logger.info("Webhook установлен в воркере PID %s", os.getpid())
-                break
-            except ApiTelegramException as e:
-                if e.error_code == 429:
-                    retry_after = e.result_json.get("parameters", {}).get("retry_after", 1)
-                    logger.warning("429 retry after %s", retry_after)
-                    time.sleep(retry_after)
-                    continue
-                else:
-                    logger.exception("Ошибка set_webhook: %s", e)
-                    break
-        
-    except subprocess.CalledProcessError as e:
-        logger.error(
-            f"Failed to restart service 'bot'. Return code: {e.returncode}. "
-            f"stdout:\n{e.stdout.strip()}\nstderr:\n{e.stderr.strip()}"
-        )
-    except Exception as e:
-        logger.exception("Unexpected error while trying to restart 'bot' service:")
 
 @receiver(post_save, sender=Configuration)
 def configuration_post_save(sender, instance, created, **kwargs):
@@ -189,7 +149,6 @@ def configuration_post_save(sender, instance, created, **kwargs):
 @receiver(post_save, sender=TelegramBotToken)
 def tgbot_token_post_save(sender, instance, created, **kwargs):
     def _deferred():
-        # запускаем в отдельном потоке, чтобы не блокировать процесс Django
-        threading.Thread(target=_swap_bots, daemon=True).start()
+        cache.set("tgbot_config_changed", time.time())  
 
     transaction.on_commit(_deferred)
