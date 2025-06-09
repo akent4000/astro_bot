@@ -37,17 +37,17 @@ def extract_query_params(call: CallbackQuery) -> dict:
         bot.answer_callback_query(call.id, Messages.MISSING_PARAMETERS_ERROR)
         return {}
 
-def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message: str=None) -> int | None:
+def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message: str | None=None) -> int | None:
     """Извлекает целочисленный параметр по ключу из словаря параметров."""
     param_list = params.get(key)
     if not param_list:
-        if error_message is not None:
+        if error_message:
             bot.answer_callback_query(call.id, error_message)
         return None
     try:
         return int(param_list[0])
     except ValueError:
-        if error_message is not None:
+        if error_message:
             bot.answer_callback_query(call.id, Messages.INCORRECT_VALUE_ERROR.format(key=key))
         return None
     
