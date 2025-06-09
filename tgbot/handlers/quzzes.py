@@ -13,7 +13,10 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 # Лог-файл будет называться так же, как модуль, например apod_api.py → logs/apod_api.log
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG")
-bot = get_main_bot()
+
+@property
+def bot():
+    return get_main_bot()
 
 # --- Обработчики QUIZZES ---
 @bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.QUIZZES)

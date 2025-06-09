@@ -15,7 +15,9 @@ Path("logs").mkdir(parents=True, exist_ok=True)
 log_filename = Path("logs") / f"{Path(__file__).stem}.log"
 logger.add(str(log_filename), rotation="10 MB", level="DEBUG", backtrace=True, diagnose=True)
 
-bot = get_main_bot()
+@property
+def bot():
+    return get_main_bot()
 
 @bot.message_handler(commands=[Commands.START])
 def handle_start(message: Message):

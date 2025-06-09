@@ -24,7 +24,9 @@ logger.add(
     diagnose=True,
 )
 
-bot = get_main_bot()
+@property
+def bot():
+    return get_main_bot()
 
 @bot.callback_query_handler(func=lambda call: get_callback_name_from_call(call) == CallbackData.APOD)
 def handle_apod(call: CallbackQuery):
