@@ -28,13 +28,14 @@ def get_user_from_call(call: CallbackQuery) -> TelegramUser | None:
         bot.answer_callback_query(call.id, Messages.USER_NOT_FOUND_ERROR)
         return None
 
-def extract_query_params(call: CallbackQuery) -> dict:
+def extract_query_params(call: CallbackQuery, show_warning: bool=True) -> dict:
     """Извлекает параметры из callback data."""
     try:
         query_string = call.data.split("?", 1)[1]
         return urllib.parse.parse_qs(query_string)
     except IndexError:
-        bot.answer_callback_query(call.id, Messages.MISSING_PARAMETERS_ERROR)
+        if show_warning:
+            bot.answer_callback_query(call.id, Messages.MISSING_PARAMETERS_ERROR)
         return {}
 
 def extract_int_param(call: CallbackQuery, params: dict, key: str, error_message: str | None=None) -> int | None:

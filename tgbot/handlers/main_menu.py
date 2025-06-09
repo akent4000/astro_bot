@@ -12,7 +12,7 @@ def main_menu(call: CallbackQuery):
     user = get_user_from_call(call)
     if not user:
         return
-    params = extract_query_params(call)
+    params = extract_query_params(call, False)
 
     session_to_delete_id = extract_int_param(
         call,
