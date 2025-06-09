@@ -7,7 +7,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'AstroBot.settings')
 
 # 2) Импортируем и инициализируем Django
 from django.core.asgi import get_asgi_application
-application = get_asgi_application()
 
 # 3) Теперь безопасно работать с ORM
 from loguru import logger
@@ -101,3 +100,4 @@ def start_bots():
 
 # 4) Запускаем ботов при импорте asgi.py, но уже в полностью инициализированном Django
 threading.Thread(target=start_bots, daemon=True).start()
+application = get_asgi_application()
