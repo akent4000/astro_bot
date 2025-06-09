@@ -26,33 +26,33 @@ def telegram_webhook(request, hook_id):
     try:
         bot = instances[int(hook_id)]
     except (KeyError, ValueError):
-        logger.warning("Webhook: неизвестный hook_id %r", hook_id)
+        logger.warning(f"Webhook: неизвестный hook_id {hook_id}")
         return HttpResponseBadRequest("Unknown bot ID")
 
     # 2) Убедиться, что метод POST
     if request.method != "POST":
-        logger.warning("Webhook(%s): неверный метод %s", hook_id, request.method)
+        logger.warning(f"Webhook({hook_id}): неверный метод {request.method}")
         return HttpResponseBadRequest("Invalid method, use POST")
 
     # 3) Распарсить JSON
     try:
         payload = json.loads(request.body)
     except json.JSONDecodeError as e:
-        logger.error("Webhook(%s): невалидный JSON: %s", hook_id, e)
+        logger.error(f"Webhook({hook_id}): невалидный JSON: {e}")
         return HttpResponseBadRequest("Invalid JSON")
 
     # 4) Превратить dict в Update
     try:
         update = types.Update.de_json(payload)
     except Exception as e:
-        logger.exception("Webhook(%s): ошибка разбора Update: %s", hook_id, e)
+        logger.exception(f"Webhook({hook_id}): ошибка разбора Update: {e}")
         return HttpResponseBadRequest("Invalid update")
 
     # 5) Передать апдейт в TeleBot
     try:
         bot.process_new_updates([update])
     except Exception as e:
-        logger.exception("Webhook(%s): ошибка обработки апдейта: %s", hook_id, e)
+        logger.exception(f"Webhook({hook_id}): ошибка обработки апдейта: {e}")
         # всё равно возвращаем 200, чтобы Telegram не пытался резендить бесконечно
         return HttpResponse("OK")
 
