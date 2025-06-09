@@ -34,6 +34,7 @@ def _run_main_bot():
     import tgbot.handlers.articles
     import tgbot.handlers.quzzes
 
+    url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
     if cache.add("telegram_webhook_set", True, timeout=24*3600):
         try:
             logger.info("Основной бот: установка webhook (только в одном воркере)")
