@@ -1,7 +1,7 @@
-# tgbot/scheduler.py
-
 import time
 import traceback
+import signal
+import threading
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -13,21 +13,34 @@ from tgbot.models import DailySubscription, InterestingFact
 from tgbot.logics.messages import SendMessages
 from tgbot.logics.constants import Constants, Messages
 
-#
-def run_scheduler():
+# Event для кооперативной остановки
+sheduler_stop_event = threading.Event()
+
+# Обработчик сигнала для корректной остановки
+def _signal_handler(signum, frame):
+    logger.info(f"Scheduler: получен сигнал {signum}, останавливаюся...")
+    sheduler_stop_event.set()
+
+# Регистрируем обработчики SIGTERM и SIGINT
+signal.signal(signal.SIGTERM, _signal_handler)
+signal.signal(signal.SIGINT, _signal_handler)
+
+def run_scheduler(stop_event: threading.Event):
     """
     Фоновая функция, которую запускают в отдельном потоке.
-    Каждую «ровную» минуту проверяет, у кого send_time совпадает с текущим московским временем,
+    Каждую «ровную» минуту проверяет, у кого send_time совпадает с текущим временем,
     а потом пытается отправить этим пользователям факт на сегодня (если он есть).
+    Можно корректно остановить через stop_event.set().
     """
     logger.info("Scheduler: запущен")
 
-    while True:
+    # Работаем, пока stop_event не установлен
+    while not stop_event.is_set():
         try:
             # Получаем текущий UTC-время с tzinfo
             now_utc = datetime.now(timezone.utc)
 
-            # Переводим в московский часовой пояс, взятый из Constants.ZONE_INFO
+            # Переводим в московский часовой пояс
             moscow_tz = ZoneInfo(Constants.ZONE_INFO)
             now_moscow = now_utc.astimezone(moscow_tz)
 
@@ -47,9 +60,13 @@ def run_scheduler():
             # Высчитываем, сколько секунд ждать до следующей «ровной» минуты
             next_minute = (now_moscow.replace(second=0, microsecond=0) + timedelta(minutes=1))
             sleep_seconds = (next_minute - now_moscow).total_seconds()
-            time.sleep(sleep_seconds)
+
+            # Ждём, но прерываем сон, если установлен stop_event
+            stop_event.wait(timeout=sleep_seconds)
 
         except Exception as ex:
             logger.error(f"Scheduler: упало с ошибкой: {ex}\n{traceback.format_exc()}")
             # Если что-то пошло не так, ждём 30 секунд и повторяем
-            time.sleep(30)
+            stop_event.wait(timeout=30)
+
+    logger.info("Scheduler: остановлен")
