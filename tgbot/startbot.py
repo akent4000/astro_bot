@@ -139,7 +139,7 @@ def _watch_config_changes(poll_interval: int = 5):
 def _clear_cahce_once():
     if cache.add(CLEAR_CACHE, True, timeout=20):
         logger.info(f"PID {os.getpid()}: сбрасываю Redis-кэш")
-        cache.delete_many([SHEDULER_SET, MAIN_BOT_WH_SET, TEST_BOT_WH_SET, "tgbot_config_changed"])
+        cache.delete_many([SHEDULER_SET, MAIN_BOT_WH_SET, TEST_BOT_WH_SET,])
         logger.info(f"PID {os.getpid()}: Redis-кэш сброшен")
     else:
         logger.info(f"PID {os.getpid()}: кэш уже сбросил другой воркер")
