@@ -132,7 +132,7 @@ def _watch_config_changes(poll_interval: int = 5):
                 logger.exception("Ошибка при реактивном swap_bots() из watcher'а")
 
 def _clear_cahce_once():
-    if cache.add("redis_cache_flushed", True, timeout=10):
+    if cache.add("redis_cache_flushed", True, timeout=20):
         logger.info(f"PID {os.getpid()}: сбрасываю Redis-кэш")
         cache.clear()
         logger.info(f"PID {os.getpid()}: Redis-кэш сброшен")
