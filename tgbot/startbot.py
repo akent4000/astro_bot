@@ -1,5 +1,5 @@
 import os
-
+import importlib
 import threading
 from tgbot import dispatcher
 from tgbot.bot_instances import instances
@@ -25,13 +25,16 @@ _scheduler_thread = None
 def _run_main_bot():
     bot = dispatcher.get_main_bot()
     # Импорт хэндлеров только после того, как бот создан
-    import tgbot.handlers.commands
-    import tgbot.handlers.main_menu
-    import tgbot.handlers.moon_calc
-    import tgbot.handlers.apod
-    import tgbot.handlers.int_facts
-    import tgbot.handlers.articles
-    import tgbot.handlers.quzzes
+    for module_name in (
+        'tgbot.handlers.commands',
+        'tgbot.handlers.main_menu',
+        'tgbot.handlers.moon_calc',
+        'tgbot.handlers.apod',
+        'tgbot.handlers.int_facts',
+        'tgbot.handlers.articles',
+        'tgbot.handlers.quzzes',
+    ):
+        module = importlib.reload(importlib.import_module(module_name))
     instances[Constants.MAIN_BOT_WH_I] = bot
     url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
     if cache.add(MAIN_BOT_WH_SET, True, timeout=24*3600):

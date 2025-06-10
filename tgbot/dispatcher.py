@@ -103,7 +103,6 @@ def get_test_bot(clear=False) -> SyncBot:
         logger.info(f"get_test_bot: прочитана конфигурация test_mode={config.test_mode}")
         if config.test_mode:
             if test_token:
-                # При тестовом режиме swap: тестовый бот получает основной токен
                 test_token = main_token
                 logger.info("get_test_bot: test_mode включен — swap main и test токенов для тестового бота")
             else:
