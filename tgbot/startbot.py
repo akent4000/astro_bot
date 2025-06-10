@@ -3,7 +3,7 @@ import os
 import threading
 from tgbot import dispatcher
 from tgbot.bot_instances import instances
-from tgbot.scheduler import run_scheduler, sheduler_stop_event
+from tgbot.scheduler import run_scheduler, sheduler_signal_handler, sheduler_stop_event
 from tgbot.models import Configuration
 from tgbot.logics.constants import Constants, Messages
 from telebot.apihelper import ApiTelegramException
@@ -107,8 +107,9 @@ def reload_bots():
     dispatcher._main_bot = None
     dispatcher._test_bot = None
     if _sheduler_thread:
-        sheduler_stop_event.set()
+        sheduler_signal_handler()
         _sheduler_thread.join()
+        _sheduler_thread = None
     _start_bots()
     _run_sheduler()
     logger.info("=== Перезапуск ботов завершён ===")
@@ -129,10 +130,10 @@ def _watch_config_changes(poll_interval: int = 5):
             try:
                 reload_bots()
             except Exception:
-                logger.exception("Ошибка при реактивном swap_bots() из watcher'а")
+                logger.exception("Ошибка при реактивном reload_bots() из watcher'а")
 
 def _clear_cahce_once():
-    if cache.add("redis_cache_flushed", True, timeout=20):
+    if cache.add(CLEAR_CACHE, True, timeout=20):
         logger.info(f"PID {os.getpid()}: сбрасываю Redis-кэш")
         cache.clear()
         logger.info(f"PID {os.getpid()}: Redis-кэш сброшен")
@@ -142,7 +143,7 @@ def _clear_cahce_once():
 def _run_sheduler():
     global _sheduler_thread
     if _sheduler_thread is None:
-        if cache.add("tgbot_scheduler_started", True, timeout=24*3600):
+        if cache.add(SHEDULER_SET, True, timeout=24*3600):
             _sheduler_thread = threading.Thread(target=run_scheduler, args=(sheduler_stop_event,), name="DailyScheduler")
             logger.info(f"Scheduler запущен (PID {os.getpid()})")
         else:

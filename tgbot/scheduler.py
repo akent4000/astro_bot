@@ -17,13 +17,13 @@ from tgbot.logics.constants import Constants, Messages
 sheduler_stop_event = threading.Event()
 
 # Обработчик сигнала для корректной остановки
-def _signal_handler(signum, frame):
-    logger.info(f"Scheduler: получен сигнал {signum}, останавливаюся...")
+def sheduler_signal_handler(signum, frame):
+    logger.info(f"Scheduler: получен сигнал {signum}, останавливаюсь...")
     sheduler_stop_event.set()
 
 # Регистрируем обработчики SIGTERM и SIGINT
-signal.signal(signal.SIGTERM, _signal_handler)
-signal.signal(signal.SIGINT, _signal_handler)
+signal.signal(signal.SIGTERM, sheduler_signal_handler)
+signal.signal(signal.SIGINT, sheduler_signal_handler)
 
 def run_scheduler(stop_event: threading.Event):
     """
@@ -67,6 +67,6 @@ def run_scheduler(stop_event: threading.Event):
         except Exception as ex:
             logger.error(f"Scheduler: упало с ошибкой: {ex}\n{traceback.format_exc()}")
             # Если что-то пошло не так, ждём 30 секунд и повторяем
-            stop_event.wait(timeout=30)
+            stop_event.wait(timeout=5)
 
     logger.info("Scheduler: остановлен")
