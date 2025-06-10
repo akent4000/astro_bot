@@ -37,6 +37,8 @@ def _run_main_bot():
         module = importlib.reload(importlib.import_module(module_name))
     instances[Constants.MAIN_BOT_WH_I] = bot
     url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
+    logger.info(f"MAIN_BOT_WH_SET: {cache.get(MAIN_BOT_WH_SET)}")
+
     if cache.add(MAIN_BOT_WH_SET, True, timeout=24*3600):
         # безопасный вызов с учётом 429
         max_retries = 3
@@ -85,6 +87,8 @@ def _run_test_bot():
         test_bot.send_message(c.message.chat.id, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
 
     # Только один воркер дальше будет регистрировать хэндлеры + ставить webhook
+    logger.info(f"TEST_BOT_WH_SET: {cache.get(TEST_BOT_WH_SET)}")
+
     if cache.add(TEST_BOT_WH_SET, True, timeout=24*3600):
         # 2) Установка webhook с учётом 429
         for attempt in range(1, 4):
@@ -106,7 +110,7 @@ def _run_test_bot():
 
 def reload_bots():
     global _scheduler_thread
-    _clear_cahce_once()
+    _clear_cache_once()
     logger.info(f"=== Начинаем полный перезапуск ботов (PID {os.getpid()}) ===")
     dispatcher._main_bot = None
     dispatcher._test_bot = None
@@ -136,10 +140,10 @@ def _watch_config_changes(poll_interval: int = 5):
             except Exception:
                 logger.exception("Ошибка при реактивном reload_bots() из watcher'а")
 
-def _clear_cahce_once():
+def _clear_cache_once():
     if cache.add(CLEAR_CACHE, True, timeout=20):
         logger.info(f"PID {os.getpid()}: сбрасываю Redis-кэш")
-        cache.delete_many([SHEDULER_SET, MAIN_BOT_WH_SET, TEST_BOT_WH_SET,])
+        cache.delete_many([SHEDULER_SET, MAIN_BOT_WH_SET, TEST_BOT_WH_SET])
         logger.info(f"PID {os.getpid()}: Redis-кэш сброшен")
     else:
         logger.info(f"PID {os.getpid()}: кэш уже сбросил другой воркер")
@@ -149,6 +153,7 @@ def _run_sheduler():
     if _scheduler_thread is not None and _scheduler_thread.is_alive():
         return
     sheduler_stop_event.clear()
+    logger.info(f"SHEDULER_SET: {cache.get(SHEDULER_SET)}")
     if cache.add(SHEDULER_SET, True, timeout=24*3600):
         _scheduler_thread = threading.Thread(
             target=run_scheduler,
@@ -169,7 +174,7 @@ def _start_bots():
     
 
 def start():
-    _clear_cahce_once()
+    _clear_cache_once()
     _start_bots()
     _run_sheduler()
     threading.Thread(target=_watch_config_changes, daemon=True).start()
