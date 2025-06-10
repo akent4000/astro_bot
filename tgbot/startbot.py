@@ -53,7 +53,7 @@ def _run_main_bot():
                     logger.exception(f"Ошибка set_webhook: {e}")
                     break
     else:
-        logger.info("Webhook уже установлен другим воркером, PID %s пропускает", os.getpid())
+        logger.info(f"Webhook уже установлен другим воркером, PID {os.getpid()} пропускает")
 
 def _run_test_bot():
     test_bot = dispatcher.get_test_bot()

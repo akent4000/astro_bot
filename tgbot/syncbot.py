@@ -134,13 +134,13 @@ class SyncBot(TeleBot):
                 from tgbot.user_helper import sync_user_data
                 data = sync_user_data(message_or_callback)
             except Exception as e:
-                logger.exception("Ошибка sync_user_data для update %r: %s", update, e)
+                logger.exception(f"Ошибка sync_user_data для update {update.update_id}: {e}")
                 self._eat_update(update)
                 continue
 
             # 3) Если sync_user_data вернул None (например, групповой чат) — тоже пропускаем
             if not data:
-                logger.debug("sync_user_data вернул None — пропускаем update %s", update.update_id)
+                logger.debug(f"sync_user_data вернул None — пропускаем update {update.update_id}")
                 self._eat_update(update)
                 continue
 
@@ -151,9 +151,7 @@ class SyncBot(TeleBot):
                     # внутри _handle_blocked_user уже съедает апдейт
                     continue
             except Exception as e:
-                logger.exception(
-                    "Ошибка при проверке блокировки пользователя %s: %s", user.id, e
-                )
+                logger.exception(f"Ошибка при проверке блокировки пользователя {user.id}: {e}")
                 self._eat_update(update)
                 continue
 
@@ -165,7 +163,7 @@ class SyncBot(TeleBot):
             try:
                 super().process_new_updates(to_handle)
             except Exception as e:
-                logger.exception("Ошибка super().process_new_updates: %s", e)
+                logger.exception(f"Ошибка super().process_new_updates: {e}")
 
     def _handle_blocked_user(self, update: Update, user) -> bool:
         from tgbot.user_helper import is_group_chat

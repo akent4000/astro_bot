@@ -29,16 +29,16 @@ def _initialize_bot(token: str) -> SyncBot:
     Вспомогательная функция, которая создаёт SyncBot и сразу
     регистрирует у него все команды из tgbot.logics.commands.init_bot_commands.
     """
-    logger.debug("_initialize_bot: вход с токеном, оканчивающимся на …%s", token[-6:])
+    logger.debug(f"_initialize_bot: вход с токеном, оканчивающимся на …{token[-6:]}")
     bot = SyncBot(token)
     try:
         # Импортируем и устанавливаем команды именно здесь, когда бот уже создан
         from tgbot.logics.commands import init_bot_commands
 
         init_bot_commands(bot)
-        logger.info("Commands initialized for bot with token ending in …%s", token[-6:])
+        logger.info(f"Commands initialized for bot with token ending in …{token[-6:]}")
     except Exception as e:
-        logger.exception("Failed to initialize bot commands: %s", e)
+        logger.exception(f"Failed to initialize bot commands: {e}")
     logger.debug("_initialize_bot: выход, возвращаем экземпляр SyncBot")
     return bot
 
@@ -58,11 +58,11 @@ def get_main_bot(clear=False) -> SyncBot:
     # Сначала читаем «основной» и «тестовый» токены
     main_token = TelegramBotToken.get_main_bot_token()
     test_token = TelegramBotToken.get_test_bot_token()
-    logger.info("get_main_bot: получены токены — main_token есть: %s, test_token есть: %s", bool(main_token), bool(test_token))
+    logger.info(f"get_main_bot: получены токены — main_token есть: {bool(main_token)}, test_token есть: {bool(test_token)}")
 
     try:
         config = Configuration.get_solo()
-        logger.info("get_main_bot: прочитана конфигурация test_mode=%s", config.test_mode)
+        logger.info(f"get_main_bot: прочитана конфигурация test_mode={config.test_mode}")
         if config.test_mode:
             if test_token:
                 main_token = test_token
@@ -96,11 +96,11 @@ def get_test_bot(clear=False) -> SyncBot:
     # Сначала читаем «основной» и «тестовый» токены
     main_token = TelegramBotToken.get_main_bot_token()
     test_token = TelegramBotToken.get_test_bot_token()
-    logger.info("get_test_bot: получены токены — main_token есть: %s, test_token есть: %s", bool(main_token), bool(test_token))
+    logger.info(f"get_test_bot: получены токены — main_token есть: {bool(main_token)}, test_token есть: {bool(test_token)}")
 
     try:
         config = Configuration.get_solo()
-        logger.info("get_test_bot: прочитана конфигурация test_mode=%s", config.test_mode)
+        logger.info(f"get_test_bot: прочитана конфигурация test_mode={config.test_mode}")
         if config.test_mode:
             if test_token:
                 # При тестовом режиме swap: тестовый бот получает основной токен

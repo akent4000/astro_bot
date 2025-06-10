@@ -63,11 +63,11 @@ def sync_user_data(update: Message | CallbackQuery | TelegramUser) -> tuple[Tele
     if changed:
         try:
             user.save()
-            logger.info("sync_user_data: Updated TelegramUser %s", user.chat_id)
+            logger.info(f"sync_user_data: Updated TelegramUser {user.chat_id}")
         except Exception as e:
-            logger.error("sync_user_data: Failed to save TelegramUser %s: %s", user.chat_id, e)
+            logger.error(f"sync_user_data: Failed to save TelegramUser {user.chat_id}: {e}")
     else:
-        logger.info("sync_user_data: No changes for TelegramUser %s", user.chat_id)
+        logger.info(f"sync_user_data: No changes for TelegramUser {user.chat_id}")
 
     return user, created
 
