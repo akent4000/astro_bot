@@ -20,7 +20,7 @@ TEST_BOT_WH_SET = "test_wh_set"
 SHEDULER_SET = "sheduler_set"
 CLEAR_CACHE = "clear_cache"
 
-_sheduler_thread = None
+_scheduler_thread = None
 
 def _run_main_bot():
     bot = dispatcher.get_main_bot()
@@ -102,15 +102,15 @@ def _run_test_bot():
         logger.info(f"Test bot уже инициализирован другим воркером (PID {os.getpid()}), пропускаем регистрацию и webhook")
 
 def reload_bots():
-    global _sheduler_thread
+    global _scheduler_thread
     _clear_cahce_once()
     logger.info(f"=== Начинаем полный перезапуск ботов (PID {os.getpid()}) ===")
     dispatcher._main_bot = None
     dispatcher._test_bot = None
-    if _sheduler_thread:
-        sheduler_signal_handler()
-        _sheduler_thread.join()
-        _sheduler_thread = None
+    if _scheduler_thread is not None and _scheduler_thread.is_alive():
+        sheduler_stop_event.set()
+        _scheduler_thread.join()
+        _scheduler_thread = None
     _start_bots()
     _run_sheduler()
     logger.info("=== Перезапуск ботов завершён ===")
@@ -142,15 +142,22 @@ def _clear_cahce_once():
         logger.info(f"PID {os.getpid()}: кэш уже сбросил другой воркер")
 
 def _run_sheduler():
-    global _sheduler_thread
-    if _sheduler_thread is None:
-        if cache.add(SHEDULER_SET, True, timeout=24*3600):
-            _sheduler_thread = threading.Thread(target=run_scheduler, args=(sheduler_stop_event,), name="DailyScheduler")
-            logger.info(f"Scheduler запущен (PID {os.getpid()})")
-        else:
-            logger.info("Scheduler уже запущен другим воркером")
+    global _scheduler_thread
+    if _scheduler_thread is not None and _scheduler_thread.is_alive():
+        return
+    sheduler_stop_event.clear()
+    if cache.add(SHEDULER_SET, True, timeout=24*3600):
+        _scheduler_thread = threading.Thread(
+            target=run_scheduler,
+            args=(sheduler_stop_event,),
+            daemon=True,
+            name="DailySchedulerThread"
+        )
+        _scheduler_thread.start()
+        logger.info(f"Scheduler запущен (PID {os.getpid()})")
     else:
         logger.info(f"Scheduler уже инициализирован другим воркером (PID {os.getpid()}), пропускаем регистрацию и webhook")
+        
 
 def _start_bots():
     logger.info(f"Запуск ботов из ASGI-процесса (PID {os.getpid()})")
