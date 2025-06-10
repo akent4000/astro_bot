@@ -102,6 +102,7 @@ def _run_test_bot():
         logger.info(f"Test bot уже инициализирован другим воркером (PID {os.getpid()}), пропускаем регистрацию и webhook")
 
 def reload_bots():
+    global _sheduler_thread
     _clear_cahce_once()
     logger.info(f"=== Начинаем полный перезапуск ботов (PID {os.getpid()}) ===")
     dispatcher._main_bot = None
