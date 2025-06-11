@@ -288,11 +288,11 @@ class SendMessages:
                 # 4) Решаем, что передавать в send_photo:
                 #    если telegram_media_id уже есть — используем его (просто обновится caption/клавиатура),
                 #    иначе скачиваем картинку в память.
+                date_str = apod_obj.date.strftime("%Y-%m-%d")
                 if apod_obj.telegram_media_id:
                     photo_source = apod_obj.telegram_media_id
                     logger.debug("Apod.send_apod: Используем existing file_id для photo_source")
                 else:
-                    date_str = apod_obj.date.strftime("%Y-%m-%d")
                     logger.info(f"Apod.send_apod: Скачиваем изображение для {date_str}")
                     image_buffer = client.fetch_image_bytes(date_str)
                     image_buffer.seek(0)
