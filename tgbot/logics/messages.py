@@ -306,7 +306,7 @@ class SendMessages:
                     user=user,
                     forced_delete=True,
                     photo=photo_source,
-                    caption=apod_obj.title or "",
+                    caption=Messages.APOD.format(date=date_str, title=apod_obj.title or ""),
                     reply_markup=Keyboards.Apod.back_to_menu(),
                     parse_mode="Markdown"
                 )
