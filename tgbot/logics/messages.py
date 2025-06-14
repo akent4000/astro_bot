@@ -3,7 +3,8 @@
 import time
 import re
 from typing import Optional, Iterable, Union
-
+from PIL import Image, ImageOps
+import io, math
 import requests
 
 from tgbot.dispatcher import get_main_bot
@@ -251,6 +252,38 @@ class SendMessages:
 
     class Apod:
         @staticmethod
+        def _prepare_for_telegram(buf: io.BytesIO) -> io.BytesIO:
+            img = Image.open(buf)
+            w, h = img.size
+
+            # 1) Уменьшаем, если w + h > 10000
+            if w + h > 10000:
+                scale = 10000 / float(w + h)
+                w_new, h_new = int(w * scale), int(h * scale)
+                img = img.resize((w_new, h_new), Image.ANTIALIAS)
+                w, h = img.size
+
+            # 2) Доводим отношение сторон до ≤ 20
+            max_ratio = 20
+            ratio = max(w/h, h/w)
+            if ratio > max_ratio:
+                if w > h:
+                    # делаем высоту = w/20
+                    new_h = math.ceil(w / max_ratio)
+                    pad_total = new_h - h
+                    border = (0, pad_total//2, 0, pad_total - pad_total//2)
+                else:
+                    new_w = math.ceil(h / max_ratio)
+                    pad_total = new_w - w
+                    border = (pad_total//2, 0, pad_total - pad_total//2, 0)
+                img = ImageOps.expand(img, border=border, fill=(0,0,0))
+
+            out = io.BytesIO()
+            img.save(out, format='JPEG')  # или PNG, как вам нужно
+            out.seek(0)
+            return out
+
+        @staticmethod
         def send_apod(user: TelegramUser):
             """
             Отправляет (или обновляет) сообщение с APOD сегодняшнего дня.
@@ -296,7 +329,7 @@ class SendMessages:
                     logger.info(f"Apod.send_apod: Скачиваем изображение для {date_str}")
                     image_buffer = client.fetch_image_bytes(date_str)
                     image_buffer.seek(0)
-                    photo_source = image_buffer
+                    photo_source = SendMessages.Apod._prepare_for_telegram(image_buffer)
                     logger.debug("Apod.send_apod: Буфер с изображением сформирован, переход к отправке")
 
                 # 5) Один раз вызываем update_or_replace_last_photo. 
