@@ -38,6 +38,7 @@ def handle_apod(call: CallbackQuery):
 
     try:
         logger.debug("Invoking SendMessages.Apod.send_apod for user {}", user.id)
+        bot.answer_callback_query(call.id, Messages.APOD_NOTIFICATION)
         SendMessages.Apod.send_apod(user)
         logger.info("APOD sent successfully to user {}", user.id)
     except APODClientError as e:
