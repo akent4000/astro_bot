@@ -256,11 +256,17 @@ class SendMessages:
             img = Image.open(buf)
             w, h = img.size
 
+            # выберем корректный атрибут ресэмплинга
+            try:
+                resample = Image.Resampling.LANCZOS
+            except AttributeError:
+                resample = Image.LANCZOS
+
             # 1) Уменьшаем, если w + h > 10000
             if w + h > 10000:
                 scale = 10000 / float(w + h)
                 w_new, h_new = int(w * scale), int(h * scale)
-                img = img.resize((w_new, h_new), Image.ANTIALIAS)
+                img = img.resize((w_new, h_new), resample)
                 w, h = img.size
 
             # 2) Доводим отношение сторон до ≤ 20
@@ -268,7 +274,6 @@ class SendMessages:
             ratio = max(w/h, h/w)
             if ratio > max_ratio:
                 if w > h:
-                    # делаем высоту = w/20
                     new_h = math.ceil(w / max_ratio)
                     pad_total = new_h - h
                     border = (0, pad_total//2, 0, pad_total - pad_total//2)
@@ -279,7 +284,7 @@ class SendMessages:
                 img = ImageOps.expand(img, border=border, fill=(0,0,0))
 
             out = io.BytesIO()
-            img.save(out, format='JPEG')  # или PNG, как вам нужно
+            img.save(out, format='JPEG')
             out.seek(0)
             return out
 
