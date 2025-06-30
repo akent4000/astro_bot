@@ -173,11 +173,18 @@ def _run_sheduler():
         return
     sheduler_stop_event.clear()
 
-    got_lock = asyncio.get_event_loop().run_until_complete(_acquire_scheduler_lock())
+    # Создаём и используем собственный event loop для асинхронного захвата lock
+    loop = asyncio.new_event_loop()
+    try:
+        got_lock = loop.run_until_complete(_acquire_scheduler_lock())
+    finally:
+        loop.close()
+
     if not got_lock:
         logger.info(f"Scheduler уже запущен другим воркером (PID {os.getpid()}) — пропускаем")
         return
 
+    # Запускаем фоновый поток выполнения задач
     _scheduler_thread = threading.Thread(
         target=run_scheduler,
         args=(sheduler_stop_event,),
