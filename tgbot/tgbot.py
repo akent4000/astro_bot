@@ -149,10 +149,22 @@ async def _acquire_scheduler_lock():
         return False
 
 def _start_bots():
+    """
+    Запускает задачи по установке вебхуков для основных и тестовых ботов
+    в отдельных потоках с собственными event loop.
+    """
     logger.info(f"Запуск ботов из ASGI (PID {os.getpid()})")
-    loop = asyncio.get_event_loop()
-    loop.create_task(_run_main_bot())
-    loop.create_task(_run_test_bot())
+    # Запуск асинхронных задач в отдельных потоках
+    threading.Thread(
+        target=lambda: asyncio.run(_run_main_bot()),
+        daemon=True,
+        name="MainBotThread"
+    ).start()
+    threading.Thread(
+        target=lambda: asyncio.run(_run_test_bot()),
+        daemon=True,
+        name="TestBotThread"
+    ).start()
 
 # Запуск шедулера с блокировкой через aioredlock
 def _run_sheduler():
