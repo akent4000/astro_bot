@@ -1,11 +1,15 @@
 import os
+import types
 import sys
-# Workaround for Python 3.12 missing distutils
-try:
-    import setuptools._distutils as _distutils
-    sys.modules['distutils'] = _distutils
-except ImportError:
-    pass
+from pathlib import Path
+
+# Workaround for Python 3.12 missing distutils using packaging
+import packaging.version
+# Create stub distutils.version module with StrictVersion alias
+distutils_version = types.ModuleType("distutils.version")
+distutils_version.StrictVersion = packaging.version.Version
+sys.modules['distutils'] = types.ModuleType('distutils')
+sys.modules['distutils.version'] = distutils_version
 
 import importlib
 import threading
