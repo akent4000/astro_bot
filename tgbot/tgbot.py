@@ -5,13 +5,26 @@ from pathlib import Path
 
 # Workaround for Python 3.12 missing distutils
 import sys, types
-try:
-    import setuptools._distutils as _distutils
-    sys.modules['distutils'] = types.ModuleType('distutils')
-    sys.modules['distutils.version'] = types.ModuleType('distutils.version')
-    sys.modules['distutils.version'].StrictVersion = _distutils.version.StrictVersion
-except ImportError:
-    pass
+
+# Create stub distutils.version with minimal StrictVersion
+_distutils_version = types.ModuleType('distutils.version')
+class StrictVersion:
+    """
+    Minimal StrictVersion to compare version strings like '6.2.6'.
+    """
+    def __init__(self, v):
+        parts = v.split('.')
+        self.version = tuple(int(p) for p in parts if p.isdigit())
+    def __lt__(self, other): return self.version < other.version
+    def __le__(self, other): return self.version <= other.version
+    def __eq__(self, other): return self.version == other.version
+    def __ge__(self, other): return self.version >= other.version
+    def __gt__(self, other): return self.version > other.version
+
+# Register stub modules
+sys.modules['distutils'] = types.ModuleType('distutils')
+sys.modules['distutils.version'] = _distutils_version
+setattr(_distutils_version, 'StrictVersion', StrictVersion)
 
 import importlib
 import threading
