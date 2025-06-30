@@ -1,4 +1,12 @@
 import os
+import sys
+# Workaround for Python 3.12 missing distutils
+try:
+    import setuptools._distutils as _distutils
+    sys.modules['distutils'] = _distutils
+except ImportError:
+    pass
+
 import importlib
 import threading
 import asyncio
