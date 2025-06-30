@@ -91,8 +91,17 @@ class Constants:
     APP_URL = f"https://{APP_DOMAIN}"
     WEBHOOCK = "webhook"
     BOT_WEBHOOCK_URL = f"{APP_URL}/{WEBHOOCK}/{{i}}/"
+    
     MAIN_BOT_WH_I = 0
     TEST_BOT_WH_I = 1
+
+    MAIN_BOT_LOCK = "tg_bot_main_lock"
+    TEST_BOT_LOCK = "tg_bot_test_lock"
+    SCHEDULER_LOCK = "tg_bot_scheduler_lock"
+    CLEAR_FLAG = "tg_bot_clear_flag"
+    CONFIG_CHANGED = "tgbot_config_changed"
+
+    MAX_RETRIES_TO_SET_WEBHOOK = 5
 
 class Messages:
     MENU_MESSAGE = "🏠 Главное меню"

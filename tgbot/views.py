@@ -1,7 +1,7 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseBadRequest
 from telebot import types
-from tgbot.bot_instances import instances
+from tgbot.bot_instances import bots
 from django.shortcuts import render
 import json
 
@@ -24,7 +24,7 @@ def telegram_webhook(request, hook_id):
     """
     # 1) Найти бот по переданному ID
     try:
-        bot = instances[int(hook_id)]
+        bot = bots[int(hook_id)]
     except (KeyError, ValueError):
         logger.warning(f"Webhook: неизвестный hook_id {hook_id}")
         return HttpResponseBadRequest("Unknown bot ID")

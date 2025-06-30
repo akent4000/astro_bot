@@ -14,15 +14,10 @@ from loguru import logger
 Path("logs").mkdir(parents=True, exist_ok=True)
 logger.add("logs/asgi.log", rotation="10 MB", level="INFO")
 
-from tgbot.startbot import start
+from tgbot.tgbot import start
 
 async def application(scope, receive, send):
-    """
-    ASGI router that:
-      – on lifespan.startup → kicks off start_bots()
-      – on lifespan.shutdown → acks and quits
-      – otherwise → delegates to Django’s HTTP/Websocket handlers
-    """
+
     if scope['type'] == 'lifespan':
         while True:
             message = await receive()
@@ -33,5 +28,4 @@ async def application(scope, receive, send):
                 await send({'type': 'lifespan.shutdown.complete'})
                 return
     else:
-        # HTTP or WebSocket → hand off to Django
         await django_app(scope, receive, send)

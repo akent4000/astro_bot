@@ -144,11 +144,11 @@ def configuration_post_save(sender, instance, created, **kwargs):
 
     if created or (old is not None and old != new):
         # вместо spawn-а одного потока, просто обновляем метку
-        cache.set("tgbot_config_changed", time.time())  
+        cache.set(Constants.CONFIG_CHANGED, time.time())  
 
 @receiver(post_save, sender=TelegramBotToken)
 def tgbot_token_post_save(sender, instance, created, **kwargs):
     def _deferred():
-        cache.set("tgbot_config_changed", time.time())  
+        cache.set(Constants.CONFIG_CHANGED, time.time())  
 
     transaction.on_commit(_deferred)
