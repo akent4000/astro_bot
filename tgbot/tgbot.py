@@ -12,7 +12,7 @@ from telebot.apihelper import ApiTelegramException
 from django.core.cache import cache
 
 from tgbot import dispatcher
-from tgbot.bot_instances import instances
+from tgbot.bot_instances import bots
 from tgbot.scheduler import run_scheduler, sheduler_stop_event
 from tgbot.logics.constants import Constants, Messages
 
@@ -104,7 +104,7 @@ def _main_bot_worker():
         'tgbot.handlers.quzzes',
     ):
         importlib.reload(importlib.import_module(module_name))
-    instances[Constants.MAIN_BOT_WH_I] = bot
+    bots[Constants.MAIN_BOT_WH_I] = bot
     url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.MAIN_BOT_WH_I)
     asyncio.run(_setup_webhook(bot, MAIN_BOT_LOCK, url, "main bot"))
 
@@ -128,7 +128,7 @@ def _test_bot_worker():
         if is_group_chat(c.message): return
         test_bot.answer_callback_query(c.id, text=Messages.IN_TEST_MODE_MESSAGE)
         test_bot.send_message(c.message.chat.id, Messages.IN_TEST_MODE_MESSAGE, parse_mode="Markdown")
-    instances[Constants.TEST_BOT_WH_I] = test_bot
+    bots[Constants.TEST_BOT_WH_I] = test_bot
     url = Constants.BOT_WEBHOOCK_URL.format(i=Constants.TEST_BOT_WH_I)
     asyncio.run(_setup_webhook(test_bot, TEST_BOT_LOCK, url, "test bot"))
 
