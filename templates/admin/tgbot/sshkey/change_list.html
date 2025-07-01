@@ -4,7 +4,6 @@
 {# Загружаем внешние CSS и JS, пусть JS выполнится после разбора DOM #}
 {% block extrahead %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/admin.css' %}">
     <script src="{% static 'js/admin_toggle.js' %}" defer></script>
 {% endblock %}
 
