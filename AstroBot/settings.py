@@ -113,13 +113,20 @@ CSP_STYLE_SRC   = ("'self'",)
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DBNAME = os.getenv('DBNAME')
+DBUSER = os.getenv('DBUSER')
+DBPASS = os.getenv('DBPASS')
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE':   'django.db.backends.postgresql',
+        'NAME':     DBNAME,
+        'USER':     DBUSER,
+        'PASSWORD': DBPASS,
+        'HOST':     'localhost',
+        'PORT':     '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
