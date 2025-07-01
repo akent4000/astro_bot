@@ -263,8 +263,7 @@ class Article(models.Model):
     )
 
     def __str__(self):
-        from tgbot.logics.telegraph_helper import parse_telegraph_title
-        return parse_telegraph_title(self.link) or "Статья без названия"
+        return self.link or "Статья без названия"
 
     class Meta:
         verbose_name = 'Статья'
