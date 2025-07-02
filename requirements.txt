@@ -10,8 +10,7 @@ requests
 redis
 django-redis
 django-solo
-django-admin-reorder
+django-modeladmin-reorder
 django-nested-inline
 Pillow
 psycopg2-binary
-uvicorn
