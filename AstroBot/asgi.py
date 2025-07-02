@@ -22,7 +22,7 @@ async def application(scope, receive, send):
         while True:
             message = await receive()
             if message['type'] == 'lifespan.startup':
-                threading.Thread(target=start, daemon=True).start()
+                #threading.Thread(target=start, daemon=True).start()
                 await send({'type': 'lifespan.startup.complete'})
             elif message['type'] == 'lifespan.shutdown':
                 await send({'type': 'lifespan.shutdown.complete'})
