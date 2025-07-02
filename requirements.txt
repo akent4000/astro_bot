@@ -14,3 +14,4 @@ django-admin-reorder
 django-nested-inline
 Pillow
 psycopg2-binary
+uvicorn
